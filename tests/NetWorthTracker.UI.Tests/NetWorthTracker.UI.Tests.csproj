@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NetWorthTracker.Shared\NetWorthTracker.Shared.csproj" />
+    <ProjectReference Include="..\..\src\NetWorthTracker.UI\NetWorthTracker.UI.csproj" />
   </ItemGroup>
 
 </Project>

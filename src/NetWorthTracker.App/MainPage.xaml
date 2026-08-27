@@ -2,12 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:NetWorthTracker.App"
-             xmlns:shared="clr-namespace:NetWorthTracker.Shared.Common;assembly=NetWorthTracker.Shared"
+             xmlns:ui="clr-namespace:NetWorthTracker.UI.Common;assembly=NetWorthTracker.UI"
              x:Class="NetWorthTracker.App.MainPage">
 
     <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
         <BlazorWebView.RootComponents>
-            <RootComponent Selector="#app" ComponentType="{x:Type shared:Routes}" />
+            <RootComponent Selector="#app" ComponentType="{x:Type ui:Routes}" />
         </BlazorWebView.RootComponents>
     </BlazorWebView>
 
