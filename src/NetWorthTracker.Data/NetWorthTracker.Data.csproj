@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\NetWorthTracker.Core\NetWorthTracker.Core.csproj" />
+    <ProjectReference Include="..\NetWorthTracker.Data.Api\NetWorthTracker.Data.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
