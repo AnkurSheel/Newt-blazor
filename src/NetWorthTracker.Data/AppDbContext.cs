@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
         _paths = paths;
     }
 
+    public DbSet<CategoryEntity> Categories => Set<CategoryEntity>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_paths.DatabaseFilePath}");
 }
