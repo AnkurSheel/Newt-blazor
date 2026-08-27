@@ -59,12 +59,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+        <EmbeddedResource Include="appsettings.json" LogicalName="appsettings.json" />
+        <EmbeddedResource Include="appsettings.Development.json" LogicalName="appsettings.Development.json" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.9" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NetWorthTracker.Data\NetWorthTracker.Data.csproj" />
       <ProjectReference Include="..\NetWorthTracker.Shared\NetWorthTracker.Shared.csproj" />
     </ItemGroup>
 
