@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss -i app.tailwind.css -o ../wwwroot/css/app.css --minify",
+    "build:css": "tailwindcss -i app.tailwind.css -o ../wwwroot/css/app.css",
+    "build:css:minify": "tailwindcss -i app.tailwind.css -o ../wwwroot/css/app.css --minify",
     "watch:css": "tailwindcss -i app.tailwind.css -o ../wwwroot/css/app.css --watch"
   },
   "keywords": [],
