@@ -1,15 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
+    <Target Name="TailwindBuild" BeforeTargets="BeforeBuild">
+        <Exec Command="yarn install" WorkingDirectory="node" Condition="!Exists('node/node_modules')" />
+        <Exec Command="yarn build:css" WorkingDirectory="node" />
+    </Target>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.11" />
-  </ItemGroup>
+    <ItemGroup>
+        <SupportedPlatform Include="browser" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NetWorthTracker.Core\NetWorthTracker.Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.19" />
+        <PackageReference Include="Syncfusion.Licensing" Version="34.2.5" />
+        <PackageReference Include="Syncfusion.Blazor.Grid" Version="34.2.5" />
+        <PackageReference Include="Syncfusion.Blazor.Inputs" Version="34.2.5" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="34.2.5" />
+    </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\NetWorthTracker.Core\NetWorthTracker.Core.csproj" />
+    </ItemGroup>
 </Project>

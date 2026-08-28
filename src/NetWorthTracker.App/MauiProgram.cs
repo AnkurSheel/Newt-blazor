@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using NetWorthTracker.Data;
+using NetWorthTracker.UI;
 
 namespace NetWorthTracker.App;
 
@@ -27,12 +28,13 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        ServiceRegistry.ConfigureServices(builder.Services);
         MauiRegistry.ConfigureServices(builder);
 
         var app = builder.Build();
 
         RunMigration(app);
-
+        ServiceRegistry.RegisterSyncfusionLicense(builder.Configuration);
         return app;
     }
 
