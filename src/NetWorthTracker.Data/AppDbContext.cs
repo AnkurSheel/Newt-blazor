@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using NetWorthTracker.Data.Api;
-using NetWorthTracker.Data.Features.Categories;
+using NetWorthTracker.Data.Features.Account;
 
 namespace NetWorthTracker.Data;
 
@@ -15,7 +15,7 @@ public class AppDbContext : DbContext
         _paths = paths;
     }
 
-    public DbSet<CategoryEntity> Categories => Set<CategoryEntity>();
+    public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_paths.DatabaseFilePath}");

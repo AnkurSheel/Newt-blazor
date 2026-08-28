@@ -11,7 +11,7 @@ using NetWorthTracker.Data;
 namespace NetWorthTracker.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260827210242_InitialCreate")]
+    [Migration("20260828060806_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace NetWorthTracker.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.19");
 
-            modelBuilder.Entity("NetWorthTracker.Data.Features.Categories.CategoryEntity", b =>
+            modelBuilder.Entity("NetWorthTracker.Data.Features.Account.AccountEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +39,7 @@ namespace NetWorthTracker.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Accounts");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,8 +1,8 @@
-﻿namespace NetWorthTracker.Data.Features.Categories;
+﻿namespace NetWorthTracker.Data.Features.Account;
 
-public class CategoryEntity
+public class AccountEntity
 {
-    public CategoryEntity(
+    public AccountEntity(
         int id,
         string name,
         string type,
