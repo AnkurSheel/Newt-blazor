@@ -31,6 +31,7 @@ public static class MauiProgram
         MauiRegistry.ConfigureServices(builder);
         UI.ServiceRegistry.ConfigureServices(builder.Services);
         Data.ServiceRegistry.ConfigureServices(builder.Services);
+        Services.ServiceRegistry.ConfigureServices(builder.Services);
 
         var app = builder.Build();
 
