@@ -43,6 +43,8 @@ public static class MauiProgram
 #if DEBUG
         AddJsonConfiguration(configuration, "appsettings.Development.json", optional: true);
 #endif
+
+        LocalEnvFile.AddToConfiguration(configuration);
     }
 
     private static void AddJsonConfiguration(ConfigurationManager configuration, string resourceName, bool optional)
