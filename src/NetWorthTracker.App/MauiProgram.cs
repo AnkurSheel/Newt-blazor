@@ -28,13 +28,14 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        ServiceRegistry.ConfigureServices(builder.Services);
         MauiRegistry.ConfigureServices(builder);
+        UI.ServiceRegistry.ConfigureServices(builder.Services);
+        Data.ServiceRegistry.ConfigureServices(builder.Services);
 
         var app = builder.Build();
 
         RunMigration(app);
-        ServiceRegistry.RegisterSyncfusionLicense(builder.Configuration);
+        UI.ServiceRegistry.RegisterSyncfusionLicense(builder.Configuration);
         return app;
     }
 
