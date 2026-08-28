@@ -1,0 +1,98 @@
+﻿@using NetWorthTracker.Core.Features.Account
+@using NetWorthTracker.Services.Api.Features.Account
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Calendars
+
+@inject IAccountService AccountService;
+
+<!-- Centered Modal Overlay Window Component Layout -->
+<SfDialog Width="460px" 
+          IsModal="true" 
+          Visible="@IsVisible" 
+          VisibleChanged="@OnVisibleChanged" 
+          ShowCloseIcon="false"
+          EnableResize="false"
+          AllowDragging="false"
+          CssClass="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden p-0">
+    <DialogTemplates>
+        <Content>
+            <!-- Custom Internal View Wrapper Layout -->
+            <div class="flex flex-col justify-between p-6 bg-slate-900 text-slate-100 min-h-[400px]">
+                <div>
+                    <!-- Header Box Section Layout -->
+                    <div class="flex items-center justify-between pb-6 border-b border-slate-800">
+                        <h3 class="text-lg font-semibold text-white">Add New Account</h3>
+                        <button @onclick="CloseModal" class="text-slate-400 hover:text-white text-xl transition">✕</button>
+                    </div>
+
+                    <!-- Main Form Fields Stack -->
+                    <div class="mt-6 space-y-5">
+
+                        <!-- Account Type Switcher Options Panel -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account Type</label>
+                            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-lg border border-slate-800">
+                                <button type="button"
+                                        @onclick="() => _newAccountType = AccountType.ASSET"
+                                        class="py-2 text-sm font-medium rounded-md transition @(_newAccountType == AccountType.ASSET ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-indigo-400")">
+                                    Asset
+                                </button>
+                                <button type="button"
+                                        @onclick="() => _newAccountType = AccountType.LIABILITY"
+                                        class="py-2 text-sm font-medium rounded-md transition @(_newAccountType == AccountType.LIABILITY ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-indigo-400")">
+                                    Liability
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Account Name Field Group Layout -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account Name</label>
+                            <SfTextBox @bind-Value="_newAccountName" Placeholder="e.g. Primary Checking" CssClass="e-dark-mode"/>
+                        </div>
+
+                        <!-- Mark as Closed Toggle Option Layout Panel -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox"
+                                       checked="@_isAccountClosed"
+                                       @onchange="ToggleClosedState"
+                                       class="rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-0 w-4 h-4"/>
+                                <span class="text-xs font-semibold text-slate-300">This account is closed</span>
+                            </label>
+
+                            @if (_isAccountClosed)
+                            {
+                                <div class="mt-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Closed Date</label>
+                                    <SfDatePicker TValue="DateTime?" @bind-Value="_closedDate" Max="@DateTime.Today" CssClass="e-dark-mode" Format="yyyy-MM-dd"/>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Call to Action Panel Layout Elements -->
+                <div class="pt-6 mt-6 border-t border-slate-800 flex items-center justify-end gap-3">
+                    <button @onclick="CloseModal"
+                            class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition">Cancel
+                    </button>
+                    <button @onclick="SaveAccount"
+                            class="px-5 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow transition">
+                        Save Account
+                    </button>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@code {
+    // Two-way interface model definitions tracking view states
+
+    // Callback event payload emitter triggers
+
+    // Internal field property initialisations isolated from parent scopes
+}

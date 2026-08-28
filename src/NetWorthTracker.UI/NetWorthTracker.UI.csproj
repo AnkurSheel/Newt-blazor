@@ -20,5 +20,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NetWorthTracker.Models\NetWorthTracker.Models.csproj" />
+        <ProjectReference Include="..\NetWorthTracker.Services.Api\NetWorthTracker.Services.Api.csproj" />
     </ItemGroup>
 </Project>
