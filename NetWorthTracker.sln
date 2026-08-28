@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.App", "src\NetWorthTracker.App\NetWorthTracker.App.csproj", "{91E263C4-744D-41EC-906A-BF8D07DF5E15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.Core", "src\NetWorthTracker.Core\NetWorthTracker.Core.csproj", "{32C9CB76-3365-4D5B-BBBB-997E6F272B94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.Models", "src\NetWorthTracker.Models\NetWorthTracker.Models.csproj", "{32C9CB76-3365-4D5B-BBBB-997E6F272B94}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.Data", "src\NetWorthTracker.Data\NetWorthTracker.Data.csproj", "{093F34CD-5681-4CAA-BF05-BEF94B3F26CE}"
 EndProject
