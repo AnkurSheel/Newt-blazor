@@ -5,7 +5,7 @@ public record AccountDTO
     public AccountDTO(int Id,
         string Name,
         AccountType Type,
-        DateTime? ClosedDate)
+        DateOnly? ClosedDate)
     {
         this.Id = Id;
         this.Name = Name;
@@ -19,7 +19,7 @@ public record AccountDTO
 
     public AccountType Type { get; init; }
 
-    public DateTime? ClosedDate { get; init; }
+    public DateOnly? ClosedDate { get; init; }
     
     public bool IsClosed => ClosedDate.HasValue;
 }

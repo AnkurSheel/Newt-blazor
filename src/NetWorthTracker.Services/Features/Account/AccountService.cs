@@ -19,26 +19,12 @@ public class AccountService : IAccountService
         return await _repository.GetAllAsync();
     }
 
-    public async Task AddAccountAsync(string name, AccountType type)
+    public async Task AddAccountAsync(string name, AccountType type, DateOnly? closedDate)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ValidationException("Category name is required.");
         }
-        await _repository.AddAsync(new AccountDTO(0, name.Trim(), type, null));
-    }
-
-    public async Task UpdateAccountAsync(AccountDTO account)
-    {
-        if (string.IsNullOrWhiteSpace(account.Name))
-        {
-            throw new ValidationException("Category name is required.");
-        }
-        await _repository.UpdateAsync(account);
-    }
-
-    public Task CloseAccountAsync(AccountDTO account)
-    {
-        return _repository.UpdateAsync(account with { ClosedDate = DateTime.UtcNow });
+        await _repository.AddAsync(new AccountDTO(0, name.Trim(), type, closedDate));
     }
 }

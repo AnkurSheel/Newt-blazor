@@ -15,7 +15,7 @@ public partial class AddAccountModal
     private AccountType _newAccountType;
     private string _newAccountName = string.Empty;
     private bool _isAccountClosed;
-    private DateTime? _closedDate;
+    private DateOnly? _closedDate;
 
     private async Task OnVisibleChanged(bool value)
     {
@@ -40,7 +40,7 @@ public partial class AddAccountModal
 
     private async Task SaveAccount()
     {
-        await AccountService.AddAccountAsync(_newAccountName, _newAccountType);
+        await AccountService.AddAccountAsync(_newAccountName, _newAccountType, _closedDate);
         await CloseModal();
     }
 

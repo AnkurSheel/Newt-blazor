@@ -20,7 +20,7 @@ public partial class AccountForm
     {
         try
         {
-            await _accountService.AddAccountAsync(_model.Name, AccountType.ASSET);
+            await _accountService.AddAccountAsync(_model.Name, AccountType.ASSET, _model.ClosedDate);
             _model.Name = string.Empty;
             _error = null;
             await OnSaved.InvokeAsync();
@@ -36,5 +36,7 @@ public partial class AccountForm
         public string Name { get; set; } = string.Empty;
 
         public AccountType Type { get; set; }
+
+        public DateOnly? ClosedDate { get; set; }
     }
 }

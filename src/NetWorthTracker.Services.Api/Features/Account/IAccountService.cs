@@ -6,9 +6,5 @@ public interface IAccountService
 {
     Task<IReadOnlyList<AccountDTO>> GetAccountsAsync();
 
-    Task AddAccountAsync(string name, AccountType type);
-
-    Task UpdateAccountAsync(AccountDTO account);
-
-    Task CloseAccountAsync(AccountDTO account);
+    Task AddAccountAsync(string name, AccountType type, DateOnly? closedDate);
 }

@@ -6,7 +6,7 @@ public class AccountEntity
         int id,
         string name,
         string type,
-        DateTime? closedDate
+        DateOnly? closedDate
     )
     {
         Name = name;
@@ -21,5 +21,5 @@ public class AccountEntity
 
     public string Type { get; private set; }
 
-    public DateTime? ClosedDate { get; private set; }
+    public DateOnly? ClosedDate { get; private set; }
 }
