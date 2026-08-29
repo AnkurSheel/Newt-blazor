@@ -1,0 +1,23 @@
+﻿@using Syncfusion.Blazor.DropDowns
+@typeparam TEnum where TEnum : struct, Enum
+
+<div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            @Label
+        </label>
+    }
+
+    <SfDropDownList TValue="TEnum"
+                    TItem="EnumDisplayItem"
+                    Value="@Value"
+                    ValueChanged="OnValueChanged"
+                    ValueExpression="() => Value"
+                    DataSource="@_items"
+                    Placeholder="@Placeholder"
+                    CssClass="e-custom-dark">
+        <DropDownListFieldSettings Value="Value" Text="Text"/>
+    </SfDropDownList>
+</div>
+

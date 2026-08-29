@@ -27,23 +27,12 @@
                     <!-- Main Form Fields Stack -->
                     <div class="mt-6 space-y-5">
 
-                        <!-- Account Type Switcher Options Panel -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account
-                                Type</label>
-                            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-lg border border-slate-800">
-                                <button type="button"
-                                        @onclick="() => _newAccountType = AccountType.ASSET"
-                                        class="py-2 text-sm font-medium rounded-md transition @(_newAccountType == AccountType.ASSET ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-indigo-400")">
-                                    Asset
-                                </button>
-                                <button type="button"
-                                        @onclick="() => _newAccountType = AccountType.LIABILITY"
-                                        class="py-2 text-sm font-medium rounded-md transition @(_newAccountType == AccountType.LIABILITY ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-indigo-400")">
-                                    Liability
-                                </button>
-                            </div>
-                        </div>
+                        
+                        <EnumDropDownList TEnum="AccountType" 
+                                          Label="Account Type" 
+                                          Placeholder="Select Account Type"
+                                          Exclude="[AccountType.DONOTUSE]"
+                                          @bind-Value="@_newAccountType" />
 
                         <!-- Account Name Field Group Layout -->
                         <div>
