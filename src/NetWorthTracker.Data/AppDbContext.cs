@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using NetWorthTracker.Data.Api;
 using NetWorthTracker.Data.Features.Account;
@@ -22,6 +25,11 @@ public class AppDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseSqlite($"Data Source={_paths.DatabaseFilePath}");
+#if DEBUG
+        options.LogTo(message => Debug.WriteLine(message), LogLevel.Information)
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors();
+#endif
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

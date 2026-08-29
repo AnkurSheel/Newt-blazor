@@ -14,9 +14,8 @@
             <span class="text-lg font-bold">+</span> Add Account
         </button>
     </header>
-    
-    <AddAccountModal @bind-IsVisible="@_isOpen">
-    </AddAccountModal>
+
+    <AddAccountModal @bind-IsVisible="@_isOpen"/>
 
     <!-- Main Table Container -->
     <main class="flex-1 p-8 overflow-auto">
@@ -48,12 +47,12 @@
                     <GridColumn Field="@nameof(AccountResponseDTO.Name)" HeaderText="Account Name" Width="220">
                         <Template>
                             @{
-                                var item = context as AccountResponseDTO;
+                                var item = (AccountResponseDTO)context;
                                 <div class="flex items-center gap-2">
-                                    <span
-                                        class="@(item?.ClosedDate != null ? "line-through text-slate-500" : "font-medium text-slate-200")">
+                                <span
+                                    class="@(item.IsClosed ? "line-through text-slate-500" : "font-medium text-slate-200")">
                                         @item?.Name
-                                    </span>
+                                </span>
                                 </div>
                             }
                         </Template>
@@ -62,8 +61,8 @@
                     <GridColumn Field="@nameof(AccountResponseDTO.Type)" HeaderText="Type" Width="120">
                         <Template>
                             @{
-                                var item = context as AccountResponseDTO;
-                                if (item?.Type == AccountType.ASSET)
+                                var item = (AccountResponseDTO)context;
+                                if (item.Type == AccountType.ASSET)
                                 {
                                     <span
                                         class="px-2.5 py-1 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 rounded-full">Asset</span>
@@ -77,26 +76,54 @@
                         </Template>
                     </GridColumn>
 
+                    <!-- Open Date -->
+                    <GridColumn Field="@nameof(AccountResponseDTO.OpenDate)" HeaderText="Open Date" Width="180">
+                        <Template>
+                            @{
+                                var item = (AccountResponseDTO)context;
+                                <span
+                                    class="text-xs font-mono text-slate-400 bg-slate-900 border border-slate-800 px-2 py-1 rounded inline-block">
+                                @item.OpenDate.ToString("MMM yyyy")
+                            </span>
+                            }
+                        </Template>
+                    </GridColumn>
+
                     <GridColumn Field="@nameof(AccountResponseDTO.ClosedDate)" HeaderText="Status / Closed Date" Width="180">
                         <Template>
                             @{
-                                var item = context as AccountResponseDTO;
-                                if (item?.ClosedDate != null)
+                                var item = (AccountResponseDTO)context;
+                                if (item.IsClosed)
                                 {
                                     <span
                                         class="text-xs font-mono text-slate-500 bg-slate-900 border border-slate-800 px-2 py-1 rounded">
                                         Closed @item?.ClosedDate?.ToString("MMM, yyyy")
-                                    </span>
+                                </span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400">
-                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Active
-                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active
+                                </span>
                                 }
                             }
                         </Template>
                     </GridColumn>
+
+                    <!-- Latest Balance -->
+                    <GridColumn Field="@nameof(AccountResponseDTO.LatestBalance)" HeaderText="Latest Balance"
+                                TextAlign="TextAlign.Right" Width="20%">
+                        <Template>
+                            @{
+                                var item = (AccountResponseDTO)context;
+                                <span
+                                    class="font-mono text-sm font-semibold @(item.Type == AccountType.LIABILITY ? "text-rose-400" : "text-emerald-400")">
+                                @(item.LatestBalance.ToString("C2"))
+                            </span>
+                            }
+                        </Template>
+                    </GridColumn>
+
                 </GridColumns>
             </SfGrid>
         </div>
