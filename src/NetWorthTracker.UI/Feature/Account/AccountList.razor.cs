@@ -8,6 +8,14 @@ public partial class AccountList
     private string _filterStatus = "Active";
     private bool _isOpen;
 
+    private decimal TotalAssets => _accounts.Where(a => !a.IsClosed && a.Type == AccountType.ASSET)
+        .Sum(a => a.LatestBalance);
+
+    private decimal TotalLiabilities => _accounts.Where(a => !a.IsClosed && a.Type == AccountType.LIABILITY)
+        .Sum(a => a.LatestBalance);
+
+    private decimal NetWorth => TotalAssets - TotalLiabilities;
+
     private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
     {
         "Active" => _accounts.Where(a => !a.IsClosed),
