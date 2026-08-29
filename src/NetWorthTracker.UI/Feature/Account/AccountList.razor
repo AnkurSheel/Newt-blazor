@@ -42,13 +42,13 @@
         </div>
 
         <div class="rounded-xl border border-slate-800 overflow-hidden shadow-2xl bg-slate-950">
-            <SfGrid DataSource="@FilteredAccounts" TValue="AccountDTO" AllowPaging="true" AllowSorting="true">
+            <SfGrid DataSource="@FilteredAccounts" TValue="AccountResponseDTO" AllowPaging="true" AllowSorting="true">
                 <GridPageSettings PageSize="10" PageSizes="true"></GridPageSettings>
                 <GridColumns>
-                    <GridColumn Field="@nameof(AccountDTO.Name)" HeaderText="Account Name" Width="220">
+                    <GridColumn Field="@nameof(AccountResponseDTO.Name)" HeaderText="Account Name" Width="220">
                         <Template>
                             @{
-                                var item = context as AccountDTO;
+                                var item = context as AccountResponseDTO;
                                 <div class="flex items-center gap-2">
                                     <span
                                         class="@(item?.ClosedDate != null ? "line-through text-slate-500" : "font-medium text-slate-200")">
@@ -59,10 +59,10 @@
                         </Template>
                     </GridColumn>
 
-                    <GridColumn Field="@nameof(AccountDTO.Type)" HeaderText="Type" Width="120">
+                    <GridColumn Field="@nameof(AccountResponseDTO.Type)" HeaderText="Type" Width="120">
                         <Template>
                             @{
-                                var item = context as AccountDTO;
+                                var item = context as AccountResponseDTO;
                                 if (item?.Type == AccountType.ASSET)
                                 {
                                     <span
@@ -77,10 +77,10 @@
                         </Template>
                     </GridColumn>
 
-                    <GridColumn Field="@nameof(AccountDTO.ClosedDate)" HeaderText="Status / Closed Date" Width="180">
+                    <GridColumn Field="@nameof(AccountResponseDTO.ClosedDate)" HeaderText="Status / Closed Date" Width="180">
                         <Template>
                             @{
-                                var item = context as AccountDTO;
+                                var item = context as AccountResponseDTO;
                                 if (item?.ClosedDate != null)
                                 {
                                     <span

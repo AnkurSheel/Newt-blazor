@@ -4,7 +4,7 @@ namespace NetWorthTracker.Services.Api.Features.Account;
 
 public interface IAccountService
 {
-    Task<IReadOnlyList<AccountDTO>> GetAccountsAsync();
+    Task<IReadOnlyList<AccountResponseDTO>> GetAccountsAsync();
 
-    Task AddAccountAsync(string name, AccountType type, DateOnly? closedDate);
+    Task AddAccountAsync(AccountCreateDTO account);
 }

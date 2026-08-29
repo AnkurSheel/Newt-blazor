@@ -14,17 +14,17 @@ public class AccountService : IAccountService
         _repository = repository;
     }
 
-    public async Task<IReadOnlyList<AccountDTO>> GetAccountsAsync()
+    public async Task<IReadOnlyList<AccountResponseDTO>> GetAccountsAsync()
     {
         return await _repository.GetAllAsync();
     }
 
-    public async Task AddAccountAsync(string name, AccountType type, DateOnly? closedDate)
+    public async Task AddAccountAsync(AccountCreateDTO account)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(account.Name))
         {
             throw new ValidationException("Category name is required.");
         }
-        await _repository.AddAsync(new AccountDTO(0, name.Trim(), type, closedDate));
+        await _repository.AddAsync(account);
     }
 }

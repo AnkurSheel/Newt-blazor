@@ -4,11 +4,11 @@ namespace NetWorthTracker.UI.Feature.Account;
 
 public partial class AccountList
 {
-    private IReadOnlyList<AccountDTO> _accounts = new List<AccountDTO>();
+    private IReadOnlyList<AccountResponseDTO> _accounts = new List<AccountResponseDTO>();
     private string _filterStatus = "Active";
     private bool _isOpen;
 
-    private IEnumerable<AccountDTO> FilteredAccounts => _filterStatus switch
+    private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
     {
         "Active" => _accounts.Where(a => !a.IsClosed),
         "Closed" => _accounts.Where(a => a.IsClosed),

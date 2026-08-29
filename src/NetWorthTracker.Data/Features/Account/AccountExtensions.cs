@@ -4,18 +4,19 @@ namespace NetWorthTracker.Data.Features.Account;
 
 public static class AccountExtensions
 {
-    public static AccountDTO ToModel(this AccountEntity accountEntity)
+    public static AccountResponseDTO ToModel(this AccountEntity accountEntity)
         => new(
             accountEntity.Id,
             accountEntity.Name,
             Enum.Parse<AccountType>(accountEntity.Type),
+            accountEntity.OpenDate,
             accountEntity.ClosedDate);
 
-    public static AccountEntity ToEntity(this AccountDTO accountDto)
+    public static AccountEntity ToEntity(this AccountCreateDTO account)
         => new(
-            accountDto.Id,
-            accountDto.Name,
-            accountDto.Type.ToString(),
-            accountDto.ClosedDate);
+            account.Name,
+            account.Type.ToString(),
+            account.OpenDate,
+            account.ClosedDate);
 }
 

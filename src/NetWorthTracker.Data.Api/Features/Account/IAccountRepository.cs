@@ -4,11 +4,7 @@ namespace NetWorthTracker.Data.Api.Features.Account;
 
 public interface IAccountRepository
 {
-    Task<IReadOnlyList<AccountDTO>> GetAllAsync();
+    Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync();
 
-    Task<AccountDTO?> GetByIdAsync(int id);
-
-    Task AddAsync(AccountDTO account);
-
-    Task UpdateAsync(AccountDTO account);
+    Task AddAsync(AccountCreateDTO account);
 }

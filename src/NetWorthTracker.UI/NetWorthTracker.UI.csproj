@@ -1,10 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-
-    <Target Name="TailwindBuild" BeforeTargets="BeforeBuild">
-        <Exec Command="yarn install" WorkingDirectory="node" Condition="!Exists('node/node_modules')" />
-        <Exec Command="yarn build:css" WorkingDirectory="node" />
-    </Target>
-
     <ItemGroup>
         <SupportedPlatform Include="browser" />
     </ItemGroup>
