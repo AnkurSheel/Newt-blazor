@@ -6,7 +6,6 @@ using NetWorthTracker.Data.Features.Account;
 namespace NetWorthTracker.Data;
 
 public class AppDbContext : DbContext
-
 {
     private readonly IAppPaths _paths;
 
@@ -18,5 +17,14 @@ public class AppDbContext : DbContext
     public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={_paths.DatabaseFilePath}");
+    {
+        options.UseSqlite($"Data Source={_paths.DatabaseFilePath}");
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
 }

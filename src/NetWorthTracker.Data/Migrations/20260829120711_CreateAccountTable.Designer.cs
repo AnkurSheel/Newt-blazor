@@ -11,8 +11,8 @@ using NetWorthTracker.Data;
 namespace NetWorthTracker.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260829064708_AccountOpenDate")]
-    partial class AccountOpenDate
+    [Migration("20260829120711_CreateAccountTable")]
+    partial class CreateAccountTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,13 +36,22 @@ namespace NetWorthTracker.Data.Migrations
                     b.Property<DateOnly>("OpenDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("accounts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Account_Dates", "[ClosedDate] IS NULL OR [ClosedDate] > [OpenDate]");
+
+                            t.HasCheckConstraint("CK_Account_Name_Length", "length([Name]) <= 256");
+
+                            t.HasCheckConstraint("CK_Account_Type_Values", "[Type] IN (1, 2)");
+                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -1,22 +1,23 @@
-﻿using NetWorthTracker.Core.Features.Account;
+﻿#region
+using NetWorthTracker.Core.Features.Account;
+#endregion
 
 namespace NetWorthTracker.Data.Features.Account;
 
 public static class AccountExtensions
 {
     public static AccountResponseDTO ToModel(this AccountEntity accountEntity)
-        => new(
+    {
+        return new AccountResponseDTO(
             accountEntity.Id,
             accountEntity.Name,
-            Enum.Parse<AccountType>(accountEntity.Type),
+            accountEntity.Type,
             accountEntity.OpenDate,
             accountEntity.ClosedDate);
+    }
 
     public static AccountEntity ToEntity(this AccountCreateDTO account)
-        => new(
-            account.Name,
-            account.Type.ToString(),
-            account.OpenDate,
-            account.ClosedDate);
+    {
+        return new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate);
+    }
 }
-

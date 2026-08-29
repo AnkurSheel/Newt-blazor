@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#region
+using Microsoft.EntityFrameworkCore;
 
 using NetWorthTracker.Core.Features.Account;
 using NetWorthTracker.Data.Api.Features.Account;
+#endregion
 
 namespace NetWorthTracker.Data.Features.Account;
 
@@ -16,7 +18,10 @@ public class AccountRepository : IAccountRepository
 
     public async Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync()
     {
-        return await _db.Accounts.AsNoTracking().Select(entity => entity.ToModel()).ToListAsync();
+        return await _db.Accounts.AsNoTracking()
+            .OrderBy(x => x.Id)
+            .Select(entity => entity.ToModel())
+            .ToListAsync();
     }
 
     public async Task AddAsync(AccountCreateDTO account)
