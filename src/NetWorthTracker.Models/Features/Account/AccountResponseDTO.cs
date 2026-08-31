@@ -2,7 +2,9 @@
 
 public record AccountResponseDTO
 {
-    public string Name { get; init; } = string.Empty;
+    public required int Id { get; init; }
+
+    public required string Name { get; init; } = string.Empty;
 
     public AccountType Type { get; init; }
 
@@ -10,7 +12,7 @@ public record AccountResponseDTO
 
     public DateOnly OpenDate { get; init; }
 
-    public decimal LatestBalance { get; init; }
+    public required decimal LatestBalance { get; init; }
 
     public bool IsClosed => ClosedDate.HasValue;
 }

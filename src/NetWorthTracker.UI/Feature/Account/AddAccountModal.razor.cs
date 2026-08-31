@@ -12,6 +12,10 @@ public partial class AddAccountModal
     [Parameter]
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
+    [Parameter]
+    public EventCallback OnAccountSaved { get; set; }
+
+
     private AccountType _newAccountType;
     private string _newAccountName = string.Empty;
     private bool _isAccountClosed;
@@ -46,6 +50,8 @@ public partial class AddAccountModal
             await AccountService.AddAccountAsync(
                 new AccountCreateDTO(_newAccountName, _newAccountType, _openDate.Value, _closedDate));
         }
+
+        await OnAccountSaved.InvokeAsync();
         await CloseModal();
     }
 

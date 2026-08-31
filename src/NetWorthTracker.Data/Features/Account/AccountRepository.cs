@@ -22,6 +22,7 @@ public class AccountRepository : IAccountRepository
             .OrderBy(x => x.Id)
             .Select(accountEntity => new AccountResponseDTO
             {
+                Id = accountEntity.Id,
                 Name = accountEntity.Name,
                 Type = accountEntity.Type,
                 OpenDate = accountEntity.OpenDate,

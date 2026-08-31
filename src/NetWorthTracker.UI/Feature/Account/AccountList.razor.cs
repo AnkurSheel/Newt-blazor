@@ -8,6 +8,10 @@ public partial class AccountList
     private string _filterStatus = "Active";
     private bool _isOpen;
 
+    private bool _isTransactionModalOpen;
+
+    private AccountResponseDTO? _selectedAccountForTransaction;
+
     private decimal TotalAssets => _accounts.Where(a => !a.IsClosed && a.Type == AccountType.ASSET)
         .Sum(a => a.LatestBalance);
 
@@ -24,6 +28,22 @@ public partial class AccountList
     };
 
     protected override async Task OnInitializedAsync()
+    {
+        _accounts = await AccountService.GetAccountsAsync();
+    }
+
+    private void OpenAddTransactionModal(AccountResponseDTO account)
+    {
+        if (account.IsClosed)
+        {
+            return;
+        }
+
+        _selectedAccountForTransaction = account;
+        _isTransactionModalOpen = true;
+    }
+
+    private async Task Refresh()
     {
         _accounts = await AccountService.GetAccountsAsync();
     }
