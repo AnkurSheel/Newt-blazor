@@ -14,5 +14,8 @@ public record AccountResponseDTO
 
     public required decimal LatestBalance { get; init; }
 
-    public bool IsClosed => ClosedDate.HasValue;
+    public bool IsClosedOn(DateOnly targetDate)
+    {
+        return ClosedDate.HasValue && ClosedDate.Value <= targetDate;
+    }
 }

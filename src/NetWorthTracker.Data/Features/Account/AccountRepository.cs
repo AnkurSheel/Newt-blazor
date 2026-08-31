@@ -16,7 +16,7 @@ public class AccountRepository : IAccountRepository
         _db = db;
     }
 
-    public async Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync()
+    public async Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync(DateOnly selectedDate)
     {
         return await _db.Accounts.AsNoTracking()
             .OrderBy(x => x.Id)
@@ -27,12 +27,11 @@ public class AccountRepository : IAccountRepository
                 Type = accountEntity.Type,
                 OpenDate = accountEntity.OpenDate,
                 ClosedDate = accountEntity.ClosedDate,
-                // EF Core translates this subquery into SQL
-                LatestBalance = _db.MonthlyBalances.Where(monthlyBalanceEntity
-                        => monthlyBalanceEntity.AccountId == accountEntity.Id)
-                    .OrderByDescending(monthlyBalanceEntity => monthlyBalanceEntity.MonthDate)
-                    .Select(monthlyBalanceEntity => monthlyBalanceEntity.Amount)
-                    .FirstOrDefault() // Use synchronous FirstOrDefault inside the LINQ expression
+                LatestBalance = _db.MonthlyBalances
+                    .Where(mb => mb.AccountId == accountEntity.Id && mb.MonthDate <= selectedDate)
+                    .OrderByDescending(mb => mb.MonthDate)
+                    .Select(mb => mb.Amount)
+                    .FirstOrDefault()
             })
             .ToListAsync();
     }

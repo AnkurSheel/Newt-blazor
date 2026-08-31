@@ -13,8 +13,21 @@ public partial class MonthYearPicker
     [Parameter]
     public EventCallback<DateOnly?> ValueChanged { get; set; }
 
+    [Parameter]
+    public EventCallback<DateOnly> NonNullableValueChanged { get; set; }
+
     private async Task OnValueChanged(DateOnly? newValue)
     {
-        await ValueChanged.InvokeAsync(newValue);
+        Value = newValue;
+
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(newValue);
+        }
+
+        if (newValue.HasValue && NonNullableValueChanged.HasDelegate)
+        {
+            await NonNullableValueChanged.InvokeAsync(newValue.Value);
+        }
     }
 }

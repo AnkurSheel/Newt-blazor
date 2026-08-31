@@ -11,30 +11,32 @@ public partial class AccountList
     private bool _isTransactionModalOpen;
 
     private AccountResponseDTO? _selectedAccountForTransaction;
+    private DateOnly _selectedDate = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
 
-    private decimal TotalAssets => _accounts.Where(a => !a.IsClosed && a.Type == AccountType.ASSET)
+    private decimal TotalAssets => _accounts.Where(a => !a.IsClosedOn(_selectedDate) && a.Type == AccountType.ASSET)
         .Sum(a => a.LatestBalance);
 
-    private decimal TotalLiabilities => _accounts.Where(a => !a.IsClosed && a.Type == AccountType.LIABILITY)
+    private decimal TotalLiabilities => _accounts
+        .Where(a => !a.IsClosedOn(_selectedDate) && a.Type == AccountType.LIABILITY)
         .Sum(a => a.LatestBalance);
 
     private decimal NetWorth => TotalAssets - TotalLiabilities;
 
     private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
     {
-        "Active" => _accounts.Where(a => !a.IsClosed),
-        "Closed" => _accounts.Where(a => a.IsClosed),
+        "Active" => _accounts.Where(a => !a.IsClosedOn(_selectedDate)),
+        "Closed" => _accounts.Where(a => a.IsClosedOn(_selectedDate)),
         _ => _accounts
     };
 
     protected override async Task OnInitializedAsync()
     {
-        _accounts = await AccountService.GetAccountsAsync();
+        await LoadAccountsAsync();
     }
 
     private void OpenAddTransactionModal(AccountResponseDTO account)
     {
-        if (account.IsClosed)
+        if (account.IsClosedOn(DateOnly.FromDateTime(DateTime.Now)))
         {
             return;
         }
@@ -45,6 +47,17 @@ public partial class AccountList
 
     private async Task Refresh()
     {
-        _accounts = await AccountService.GetAccountsAsync();
+        _accounts = await AccountService.GetAccountsAsync(_selectedDate);
+    }
+
+    private async Task OnDateChanged(DateOnly newDate)
+    {
+        _selectedDate = newDate;
+        await LoadAccountsAsync();
+    }
+
+    private async Task LoadAccountsAsync()
+    {
+        _accounts = await AccountService.GetAccountsAsync(_selectedDate);
     }
 }

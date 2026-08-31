@@ -14,9 +14,9 @@ public class AccountService : IAccountService
         _repository = repository;
     }
 
-    public async Task<IReadOnlyList<AccountResponseDTO>> GetAccountsAsync()
+    public async Task<IReadOnlyList<AccountResponseDTO>> GetAccountsAsync(DateOnly selectedDate)
     {
-        return await _repository.GetAllAsync();
+        return await _repository.GetAllAsync(selectedDate);
     }
 
     public async Task AddAccountAsync(AccountCreateDTO account)
