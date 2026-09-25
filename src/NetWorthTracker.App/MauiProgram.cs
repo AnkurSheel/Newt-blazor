@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
+using NetWorthTracker.Common;
 using NetWorthTracker.Data;
-using NetWorthTracker.UI;
+
+using ServiceRegistry = NetWorthTracker.Common.ServiceRegistry;
 
 namespace NetWorthTracker.App;
 
@@ -16,10 +18,11 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         ConfigureAppSettings(builder.Configuration);
 
-        builder.UseMauiApp<App>().ConfigureFonts(fonts =>
-        {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-        });
+        builder.UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            });
 
         builder.Services.AddMauiBlazorWebView();
 
@@ -29,23 +32,23 @@ public static class MauiProgram
 #endif
 
         MauiRegistry.ConfigureServices(builder);
+        ServiceRegistry.ConfigureServices(builder.Services, builder.Configuration);
         UI.ServiceRegistry.ConfigureServices(builder.Services);
-        Data.ServiceRegistry.ConfigureServices(builder.Services);
-        Services.ServiceRegistry.ConfigureServices(builder.Services);
 
         var app = builder.Build();
 
         RunMigration(app);
         UI.ServiceRegistry.RegisterSyncfusionLicense(builder.Configuration);
+
         return app;
     }
 
     private static void ConfigureAppSettings(ConfigurationManager configuration)
     {
-        AddJsonConfiguration(configuration, "appsettings.json", optional: false);
+        AddJsonConfiguration(configuration, "appsettings.json", false);
 
 #if DEBUG
-        AddJsonConfiguration(configuration, "appsettings.Development.json", optional: true);
+        AddJsonConfiguration(configuration, "appsettings.Development.json", true);
 #endif
 
         LocalEnvFile.AddToConfiguration(configuration);
@@ -53,7 +56,8 @@ public static class MauiProgram
 
     private static void AddJsonConfiguration(ConfigurationManager configuration, string resourceName, bool optional)
     {
-        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        var stream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream(resourceName);
 
         if (stream is null)
         {
@@ -72,6 +76,7 @@ public static class MauiProgram
     {
         using var scope = app.Services.CreateScope();
 
-        scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+        scope.ServiceProvider.GetRequiredService<AppDbContext>()
+            .Database.Migrate();
     }
 }

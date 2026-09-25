@@ -72,8 +72,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NetWorthTracker.Data\NetWorthTracker.Data.csproj" />
-      <ProjectReference Include="..\NetWorthTracker.Services\NetWorthTracker.Services.csproj" />
+      <ProjectReference Include="..\NetWorthTracker.Common\NetWorthTracker.Common.csproj" />
       <ProjectReference Include="..\NetWorthTracker.UI\NetWorthTracker.UI.csproj" />
     </ItemGroup>
 

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 
-namespace NetWorthTracker.App;
+namespace NetWorthTracker.Common;
 
-internal static class LocalEnvFile
+public static class LocalEnvFile
 {
     public static void AddToConfiguration(ConfigurationManager configuration)
     {

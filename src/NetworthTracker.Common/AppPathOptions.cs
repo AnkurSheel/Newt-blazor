@@ -1,4 +1,4 @@
-namespace NetWorthTracker.App;
+namespace NetWorthTracker.Common;
 
 public class AppPathOptions
 {
