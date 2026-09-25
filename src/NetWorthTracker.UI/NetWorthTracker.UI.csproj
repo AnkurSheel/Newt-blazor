@@ -5,7 +5,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.19" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.20" />
         <PackageReference Include="Syncfusion.Licensing" Version="34.2.5" />
         <PackageReference Include="Syncfusion.Blazor.Grid" Version="34.2.5" />
         <PackageReference Include="Syncfusion.Blazor.Inputs" Version="34.2.5" />
