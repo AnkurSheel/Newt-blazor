@@ -1,4 +1,5 @@
 ﻿using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Core.Features.FinancialSummary;
 
 namespace NetWorthTracker.UI.Feature.Account;
 
@@ -6,21 +7,13 @@ public partial class AccountList
 {
     private IReadOnlyList<AccountResponseDTO> _accounts = new List<AccountResponseDTO>();
     private string _filterStatus = "Active";
+    private FinancialSummaryDTO _financialSummary = new(0, 0, 0);
     private bool _isOpen;
 
     private bool _isTransactionModalOpen;
 
     private AccountResponseDTO? _selectedAccountForTransaction;
-    private DateOnly _selectedDate = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
-
-    private decimal TotalAssets => _accounts.Where(a => !a.IsClosedOn(_selectedDate) && a.Type == AccountType.ASSET)
-        .Sum(a => a.LatestBalance);
-
-    private decimal TotalLiabilities => _accounts
-        .Where(a => !a.IsClosedOn(_selectedDate) && a.Type == AccountType.LIABILITY)
-        .Sum(a => a.LatestBalance);
-
-    private decimal NetWorth => TotalAssets - TotalLiabilities;
+    private DateOnly _selectedDate = new(DateTime.Now.Year, DateTime.Now.Month, 1);
 
     private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
     {
@@ -32,6 +25,7 @@ public partial class AccountList
     protected override async Task OnInitializedAsync()
     {
         await LoadAccountsAsync();
+        await LoadFinancialSummary();
     }
 
     private void OpenAddTransactionModal(AccountResponseDTO account)
@@ -48,16 +42,23 @@ public partial class AccountList
     private async Task Refresh()
     {
         _accounts = await AccountService.GetAccountsAsync(_selectedDate);
+        _financialSummary = await FinancialSummaryService.GetFinancialSummaryAsync(_selectedDate);
     }
 
     private async Task OnDateChanged(DateOnly newDate)
     {
         _selectedDate = newDate;
         await LoadAccountsAsync();
+        await LoadFinancialSummary();
     }
 
     private async Task LoadAccountsAsync()
     {
         _accounts = await AccountService.GetAccountsAsync(_selectedDate);
+    }
+
+    private async Task LoadFinancialSummary()
+    {
+        _financialSummary = await FinancialSummaryService.GetFinancialSummaryAsync(_selectedDate);
     }
 }
