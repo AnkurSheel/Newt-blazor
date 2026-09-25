@@ -11,7 +11,7 @@ public partial class AccountList
     private bool _isTransactionModalOpen;
 
     private AccountResponseDTO? _selectedAccountForTransaction;
-    private DateOnly _selectedDate = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
+    private DateOnly _selectedDate = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, 1);
 
     private decimal TotalAssets => _accounts.Where(a => !a.IsClosedOn(_selectedDate) && a.Type == AccountType.ASSET)
         .Sum(a => a.LatestBalance);

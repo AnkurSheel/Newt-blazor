@@ -35,7 +35,7 @@ public partial class AddMonthlyBalanceModal
     protected override void OnParametersSet()
     {
         _balance = StartingBalance;
-        _transactionDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1));
+        _transactionDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1));
     }
 
     private void OnMonthChanged(ChangeEventArgs e)
