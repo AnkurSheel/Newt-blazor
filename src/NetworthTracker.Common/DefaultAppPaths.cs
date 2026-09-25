@@ -1,19 +1,17 @@
 ﻿using Microsoft.Extensions.Options;
-
-using NetWorthTracker.Common;
 using NetWorthTracker.Data.Api;
 
-namespace NetWorthTracker.Seeder;
+namespace NetWorthTracker.Common;
 
-public class SeederAppPaths : IAppPaths
+public class DefaultAppPaths : IAppPaths
 {
-    public SeederAppPaths(IOptions<AppPathOptions> options)
+    public DefaultAppPaths(IOptions<AppPathOptions> options, string? fallbackDirectory = null)
     {
         var appPathOptions = options.Value;
         var databaseDirectory = appPathOptions.DatabaseDirectory;
 
         databaseDirectory = string.IsNullOrWhiteSpace(databaseDirectory)
-            ? AppContext.BaseDirectory
+            ? (fallbackDirectory ?? AppContext.BaseDirectory)
             : ResolveConfiguredDirectory(databaseDirectory);
 
         Directory.CreateDirectory(databaseDirectory);
