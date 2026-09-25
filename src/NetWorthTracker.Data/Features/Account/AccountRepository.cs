@@ -9,16 +9,16 @@ namespace NetWorthTracker.Data.Features.Account;
 
 public class AccountRepository : IAccountRepository
 {
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _dbContext;
 
-    public AccountRepository(AppDbContext db)
+    public AccountRepository(AppDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync(DateOnly selectedDate)
     {
-        return await _db.Accounts.AsNoTracking()
+        return await _dbContext.Accounts.AsNoTracking()
             .OrderBy(x => x.Id)
             .Select(accountEntity => new AccountResponseDTO
             {
@@ -27,8 +27,8 @@ public class AccountRepository : IAccountRepository
                 Type = accountEntity.Type,
                 OpenDate = accountEntity.OpenDate,
                 ClosedDate = accountEntity.ClosedDate,
-                LatestBalance = _db.MonthlyBalances
-                    .Where(mb => mb.AccountId == accountEntity.Id && mb.MonthDate <= selectedDate)
+                LatestBalance = _dbContext.MonthlyBalances
+                    .Where(mb => mb.AccountId == accountEntity.Id && mb.MonthDate == selectedDate)
                     .OrderByDescending(mb => mb.MonthDate)
                     .Select(mb => mb.Amount)
                     .FirstOrDefault()
@@ -38,7 +38,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task AddAsync(AccountCreateDTO account)
     {
-        _db.Accounts.Add(new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate));
-        await _db.SaveChangesAsync();
+        _dbContext.Accounts.Add(new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate));
+        await _dbContext.SaveChangesAsync();
     }
 }
