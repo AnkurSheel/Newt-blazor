@@ -11,6 +11,7 @@ public static class ServiceRegistry
 {
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddDbContextFactory<AppDbContext>();
         services.AddDbContext<AppDbContext>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IMonthlyBalanceRepository, MonthlyBalanceRepository>();
