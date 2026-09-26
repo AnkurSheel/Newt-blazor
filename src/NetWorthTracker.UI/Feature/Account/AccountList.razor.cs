@@ -1,5 +1,4 @@
 ﻿using NetWorthTracker.Core.Features.Account;
-using NetWorthTracker.Core.Features.FinancialSummary;
 
 namespace NetWorthTracker.UI.Feature.Account;
 
@@ -7,7 +6,6 @@ public partial class AccountList
 {
     private IReadOnlyList<AccountResponseDTO> _accounts = new List<AccountResponseDTO>();
     private string _filterStatus = "Active";
-    private FinancialSummaryDTO _financialSummary = new(0, 0, 0);
     private bool _isOpen;
 
     private bool _isTransactionModalOpen;
@@ -25,7 +23,6 @@ public partial class AccountList
     protected override async Task OnInitializedAsync()
     {
         await LoadAccountsAsync();
-        await LoadFinancialSummary();
     }
 
     private void OpenAddTransactionModal(AccountResponseDTO account)
@@ -41,24 +38,17 @@ public partial class AccountList
 
     private async Task Refresh()
     {
-        _accounts = await AccountService.GetAccountsAsync(_selectedDate);
-        _financialSummary = await FinancialSummaryService.GetFinancialSummaryAsync(_selectedDate);
+        await LoadAccountsAsync();
     }
 
     private async Task OnDateChanged(DateOnly newDate)
     {
         _selectedDate = newDate;
         await LoadAccountsAsync();
-        await LoadFinancialSummary();
     }
 
     private async Task LoadAccountsAsync()
     {
         _accounts = await AccountService.GetAccountsAsync(_selectedDate);
-    }
-
-    private async Task LoadFinancialSummary()
-    {
-        _financialSummary = await FinancialSummaryService.GetFinancialSummaryAsync(_selectedDate);
     }
 }

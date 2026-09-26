@@ -1,0 +1,19 @@
+﻿@using NetWorthTracker.Services.Api.Features.FinancialSummary
+@inject IFinancialSummaryService FinancialSummaryService
+
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+    <FinancialCardSummary Title="Total Assets" BadgeText="▲ Asset" CssColor="text-emerald-400"
+                          Amount="_financialSummary.TotalAssets"
+                          BadgeBorderCssColors="bg-emerald-950/60 border border-emerald-800/40"/>
+
+    <FinancialCardSummary Title="Total Liabilities" BadgeText="▼ Debt" CssColor="text-rose-400"
+                          Amount="_financialSummary.TotalLiabilities"
+                          BadgeBorderCssColors="bg-rose-950/60 border border-rose-800/40"/>
+
+    <FinancialCardSummary Title="Net Worth" BadgeText="Total" CssColor="text-indigo-400"
+                          Amount="_financialSummary.NetWorth"
+                          BadgeBorderCssColors="bg-indigo-950/60 border border-indigo-800/40"/>
+
+</div>
