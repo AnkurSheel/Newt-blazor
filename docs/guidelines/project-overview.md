@@ -82,9 +82,10 @@ Contains all core data models, DTOs (Data Transfer Objects), enums, and exceptio
    - Use latest C# 13 features where appropriate (e.g., file-scoped namespaces, required properties, collection expressions).
    - Warnings are treated as errors (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`). Ensure code compiles without warnings.
 
-2. **Blazor Component Design:**
+2. **Blazor Component Design & UI Guidelines:**
    - Use the code-behind pattern: place markup in `ComponentName.razor` and C# logic in `ComponentName.razor.cs` (as `partial class`).
    - Use parameter validation and event callbacks for child-to-parent communication.
+   - For all UI development, visual tokens, color palette, dark mode classes, and component templates, strictly follow the [UI Style Guide & Component Standards](ui-style-guide.md).
    - Keep UI components responsive and styled according to project Tailwind utilities.
 
 3. **Data & Service Access:**
