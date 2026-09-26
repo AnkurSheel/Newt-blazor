@@ -4,6 +4,6 @@ public partial class Index
 {
     protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo("/accounts");
+        NavigationManager.NavigateTo("/dashboard");
     }
 }
