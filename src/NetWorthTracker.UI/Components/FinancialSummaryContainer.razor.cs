@@ -7,7 +7,8 @@ namespace NetWorthTracker.UI.Components;
 public partial class FinancialSummaryContainer : ComponentBase
 {
     private DateOnly _lastFetchedDate;
-    private MonthlySummaryDTO _monthlySummary = new(0, 0);
+    private MonthlyNetworthChangeDTO _monthlyNetworthChange = MonthlyNetworthChangeDTO.Default;
+    private MonthlySummaryDTO _monthlySummary = MonthlySummaryDTO.Default;
 
     [Parameter]
     public DateOnly SelectedDate { get; set; }
@@ -18,11 +19,17 @@ public partial class FinancialSummaryContainer : ComponentBase
         {
             _lastFetchedDate = SelectedDate;
             await LoadSummaryAsync();
+            await LoadMonthlyNetworthChangeAsync();
         }
     }
 
     private async Task LoadSummaryAsync()
     {
         _monthlySummary = await FinancialSummaryService.GetMonthlySummary(SelectedDate);
+    }
+
+    private async Task LoadMonthlyNetworthChangeAsync()
+    {
+        _monthlyNetworthChange = await FinancialSummaryService.GetMonthlyNetworthChangeAsync(SelectedDate);
     }
 }

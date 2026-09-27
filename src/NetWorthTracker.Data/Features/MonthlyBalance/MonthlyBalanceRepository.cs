@@ -43,6 +43,6 @@ public class MonthlyBalanceRepository : IMonthlyBalanceRepository
                        g.Sum(x => x.AccountType == AccountType.ASSET ? x.Amount : 0m),
                        g.Sum(x => x.AccountType == AccountType.LIABILITY ? x.Amount : 0m)))
                    .FirstOrDefaultAsync()
-               ?? new MonthlySummaryDTO(0, 0);
+               ?? MonthlySummaryDTO.Default;
     }
 }
