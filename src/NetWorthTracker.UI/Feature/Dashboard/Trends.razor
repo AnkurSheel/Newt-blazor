@@ -4,7 +4,13 @@
         <span class="w-2 h-2 rounded-full bg-teal-400"></span>
         <h2 class="text-xs font-bold tracking-wider text-slate-400 uppercase">@Title</h2>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-rows-1 md:grid-rows-3 gap-4">
+        <CumulativeAreaChart Title="Cumulative $ Change"
+                             Format="c"
+                             Data="CumulativeData"
+                             IntervalType="IntervalType"
+                             LabelFormat="@LabelFormat"
+                             ShowMarkers="ShowMarkers"/>
         <ChangeBarChart Title="% Change"
                         Format="p"
                         Data="PercentChangeData"
@@ -15,11 +21,5 @@
                         Data="AbsoluteChangeData"
                         IntervalType="IntervalType"
                         LabelFormat="@LabelFormat"/>
-        <CumulativeAreaChart Title="Cumulative $ Change"
-                             Format="c"
-                             Data="CumulativeData"
-                             IntervalType="IntervalType"
-                             LabelFormat="@LabelFormat"
-                             ShowMarkers="ShowMarkers"/>
     </div>
 </section>
