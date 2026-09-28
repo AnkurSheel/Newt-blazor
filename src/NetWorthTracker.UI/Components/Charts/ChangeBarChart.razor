@@ -1,0 +1,31 @@
+﻿@using Syncfusion.Blazor.Charts
+@using ValueType = Syncfusion.Blazor.Charts.ValueType
+
+<div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-md">
+    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">@Title</h3>
+
+    <div class="h-48">
+        <SfChart Background="transparent">
+            <ChartPrimaryXAxis ValueType="ValueType.DateTime"
+                               LabelFormat="@LabelFormat"
+                               IntervalType="IntervalType"
+                               PlotOffset="2"
+                               EdgeLabelPlacement="EdgeLabelPlacement.Shift"
+                               LabelIntersectAction="LabelIntersectAction.Hide">
+                <ChartAxisMajorGridLines Width="0"/>
+                <ChartAxisLineStyle Width="0.5" Color="#334155"/>
+            </ChartPrimaryXAxis>
+            <ChartPrimaryYAxis LabelFormat="@Format">
+                <ChartAxisMajorGridLines Width="0.5" Color="#1e293b"/>
+                <ChartAxisLineStyle Width="0"/>
+            </ChartPrimaryYAxis>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@Data" XName="Period" YName="Value" PointColorMapping="Color"
+                             Type="ChartSeriesType.Column">
+                    <ChartCornerRadius TopLeft="3" TopRight="3"/>
+                </ChartSeries>
+            </ChartSeriesCollection>
+            <ChartTooltipSettings Enable="true" Shared="false"/>
+        </SfChart>
+    </div>
+</div>

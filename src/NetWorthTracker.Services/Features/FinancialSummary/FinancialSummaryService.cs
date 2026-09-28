@@ -32,12 +32,59 @@ public class FinancialSummaryService : IFinancialSummaryService
         var previousMonthlySummary = previousMonthlySummaryAsyncTask.Result;
 
         return new MonthlyNetworthChangeDTO(
+            currentMonthlySummary.SelectedDate,
             CalculateAbsoluteChange(currentMonthlySummary.TotalAssets, previousMonthlySummary.TotalAssets),
             CalculatePercentageChange(currentMonthlySummary.TotalAssets, previousMonthlySummary.TotalAssets),
             CalculateAbsoluteChange(currentMonthlySummary.TotalLiabilities, previousMonthlySummary.TotalLiabilities),
             CalculatePercentageChange(currentMonthlySummary.TotalLiabilities, previousMonthlySummary.TotalLiabilities),
             CalculateAbsoluteChange(currentMonthlySummary.NetWorth, previousMonthlySummary.NetWorth),
             CalculatePercentageChange(currentMonthlySummary.NetWorth, previousMonthlySummary.NetWorth));
+    }
+
+    public async Task<IReadOnlyList<TrendDTO>> GetMonthlyTrendsAsync(DateOnly selectedDate)
+    {
+        IReadOnlyList<MonthlySummaryDTO> monthlySummaries =
+            await _monthlyBalanceRepository.GetMonthlySummariesAsync(selectedDate);
+
+        var trends = new List<TrendDTO>();
+        var monthlySummary = monthlySummaries[0];
+        trends.Add(new TrendDTO(monthlySummary.SelectedDate, monthlySummary.NetWorth, 0, 0));
+        for (var i = 1; i < monthlySummaries.Count; i++)
+        {
+            monthlySummary = monthlySummaries[i];
+            var previousMonthlySummary = monthlySummaries[i - 1];
+            var trend = new TrendDTO(
+                monthlySummary.SelectedDate,
+                monthlySummary.NetWorth,
+                CalculateAbsoluteChange(monthlySummary.NetWorth, previousMonthlySummary.NetWorth),
+                CalculatePercentageChange(monthlySummary.NetWorth, previousMonthlySummary.NetWorth));
+            trends.Add(trend);
+        }
+
+        return trends;
+    }
+
+    public async Task<IReadOnlyList<TrendDTO>> GetYearlyTrendsAsync(DateOnly selectedDate)
+    {
+        IReadOnlyList<MonthlySummaryDTO> yearlySummaries =
+            await _monthlyBalanceRepository.GetYearlySummariesAsync(selectedDate);
+
+        var trends = new List<TrendDTO>();
+        var yearlySummary = yearlySummaries[0];
+        trends.Add(new TrendDTO(yearlySummary.SelectedDate, yearlySummary.NetWorth, 0, 0));
+        for (var i = 1; i < yearlySummaries.Count; i++)
+        {
+            yearlySummary = yearlySummaries[i];
+            var previousYearlySummary = yearlySummaries[i - 1];
+            var trend = new TrendDTO(
+                yearlySummary.SelectedDate,
+                yearlySummary.NetWorth,
+                CalculateAbsoluteChange(yearlySummary.NetWorth, previousYearlySummary.NetWorth),
+                CalculatePercentageChange(yearlySummary.NetWorth, previousYearlySummary.NetWorth));
+            trends.Add(trend);
+        }
+
+        return trends;
     }
 
     private decimal CalculateAbsoluteChange(decimal currentValue, decimal previous)
