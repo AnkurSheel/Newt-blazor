@@ -8,3 +8,15 @@ node_modules/
 .env
 .env.*
 !.env.example
+*.db
+*.csv
+*.sql
+wwwroot/css/app.css
+*.db
+*.csv
+*.sql
+wwwroot/css/app.css
+*.db
+*.csv
+*.sql
+wwwroot/css/app.css
