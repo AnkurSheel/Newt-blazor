@@ -1,0 +1,11 @@
+﻿<NavLink href="@Link"
+         title="@(IsCollapsed ? Title : null)"
+         class="@($"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition {(IsCollapsed ? "justify-center px-0" : "")}")"
+         ActiveClass="bg-slate-800/90 text-indigo-400 font-semibold shadow-inner border border-slate-700/50"
+         Match="@Match">
+    @SvgContent
+    @if (!IsCollapsed)
+    {
+        <span class="truncate">@Title</span>
+    }
+</NavLink>

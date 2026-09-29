@@ -10,7 +10,7 @@ public partial class FinancialSummaryContainer : ComponentBase
     private MonthlyNetworthChangeDTO _monthlyNetworthChange = MonthlyNetworthChangeDTO.Default;
     private MonthlySummaryDTO _monthlySummary = MonthlySummaryDTO.Default;
 
-    [Parameter]
+    [CascadingParameter]
     public DateOnly SelectedDate { get; set; }
 
     protected override async Task OnParametersSetAsync()

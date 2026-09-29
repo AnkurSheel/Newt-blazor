@@ -1,4 +1,6 @@
-﻿using NetWorthTracker.Core.Features.Account;
+﻿using Microsoft.AspNetCore.Components;
+
+using NetWorthTracker.Core.Features.Account;
 
 namespace NetWorthTracker.UI.Feature.Account;
 
@@ -11,12 +13,14 @@ public partial class AccountList
     private bool _isTransactionModalOpen;
 
     private AccountResponseDTO? _selectedAccountForTransaction;
-    private DateOnly _selectedDate = new(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+    [CascadingParameter]
+    public DateOnly SelectedDate { get; set; }
 
     private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
     {
-        "Active" => _accounts.Where(a => !a.IsClosedOn(_selectedDate)),
-        "Closed" => _accounts.Where(a => a.IsClosedOn(_selectedDate)),
+        "Active" => _accounts.Where(a => !a.IsClosedOn(SelectedDate)),
+        "Closed" => _accounts.Where(a => a.IsClosedOn(SelectedDate)),
         _ => _accounts
     };
 
@@ -41,14 +45,13 @@ public partial class AccountList
         await LoadAccountsAsync();
     }
 
-    private async Task OnDateChanged(DateOnly newDate)
+    protected override async Task OnParametersSetAsync()
     {
-        _selectedDate = newDate;
         await LoadAccountsAsync();
     }
 
     private async Task LoadAccountsAsync()
     {
-        _accounts = await AccountService.GetAccountsAsync(_selectedDate);
+        _accounts = await AccountService.GetAccountsAsync(SelectedDate);
     }
 }

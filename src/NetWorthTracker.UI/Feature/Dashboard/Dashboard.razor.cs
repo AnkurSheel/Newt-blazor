@@ -8,17 +8,11 @@ public partial class Dashboard
 {
     private readonly IFinancialSummaryService _financialSummaryService;
     private IReadOnlyList<TrendDTO> _monthlyTrendData = new List<TrendDTO>();
-    private DateOnly _selectedDate = new(DateTime.Now.Year, DateTime.Now.Month, 1);
     private IReadOnlyList<TrendDTO> _yearlyTrendData = new List<TrendDTO>();
 
     public Dashboard(IFinancialSummaryService financialSummaryService)
     {
         _financialSummaryService = financialSummaryService;
-    }
-
-    private void OnDateChanged(DateOnly selectedDate)
-    {
-        _selectedDate = selectedDate;
     }
 
     protected override async Task OnInitializedAsync()

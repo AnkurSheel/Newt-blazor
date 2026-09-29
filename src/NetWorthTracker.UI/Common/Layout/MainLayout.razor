@@ -3,8 +3,29 @@
 
 <div class="flex min-h-screen w-full bg-slate-900 text-slate-100 e-dark-mode">
     <NavMenu/>
-
     <div class="flex-1 min-w-0">
-        @Body
+
+        <header
+            class="h-16 border-b border-slate-800 px-4 sm:px-8 flex items-center justify-between bg-slate-900/80 backdrop-blur sticky top-0 z-10">
+            <h1 class="text-lg sm:text-xl font-semibold tracking-wide text-white truncate">Dashboard</h1>
+
+            <div class="flex items-center gap-3">
+                <!-- Custom Syncfusion Month/Year Picker -->
+                <div class="w-48 sm:w-56">
+                    <MonthYearPicker Value="@_selectedDate"
+                                     NonNullableValueChanged="OnDateChanged"
+                                     Label=""/>
+                </div>
+            </div>
+        </header>
+
+        <CascadingValue Value="@_selectedDate">
+            <div class="min-h-screen w-full flex flex-col bg-slate-900 text-slate-100 font-sans">
+                <main class="flex-1 p-4 sm:p-8 overflow-x-hidden space-y-6">
+                    <FinancialSummaryContainer/>
+                    @Body
+                </main>
+            </div>
+        </CascadingValue>
     </div>
 </div>
