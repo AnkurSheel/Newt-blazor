@@ -89,7 +89,13 @@ NetWorthTracker.UI/
 │   ├── FinancialSummaryContainer.razor # 3-card summary grid
 │   ├── FinancialSummaryContainer.razor.cs
 │   ├── MonthYearPicker.razor       # Syncfusion Month/Year date picker wrapper
-│   └── MonthYearPicker.razor.cs
+│   ├── MonthYearPicker.razor.cs
+│   └── Icons/                      # Dedicated SVG icon components
+│       ├── AccountIcon.razor
+│       ├── ChevronLeftIcon.razor
+│       ├── ChevronRightIcon.razor
+│       ├── CopyIcon.razor
+│       └── DashboardIcon.razor
 ├── Feature/                        # Domain-specific feature modules
 │   ├── Account/
 │   │   ├── AccountList.razor       # Account management & data grid page
@@ -110,6 +116,7 @@ NetWorthTracker.UI/
 2. **Feature Isolation:** Place feature-specific modals, pages, and subcomponents inside `Feature/{FeatureName}/`.
 3. **Reusable Widgets:** Place shared, reusable components without business logic inside `Components/`.
 4. **Service Injection:** Inject service contracts (`IAccountService`, `IFinancialSummaryService`), never direct DbContext or repositories.
+5. **SVG Icons as Dedicated Components:** Every SVG icon must be its own reusable component in the `Components/Icons/` folder rather than inlined directly in pages, modals, or layout markup.
 
 ---
 
@@ -264,6 +271,21 @@ Modals must use either `SfDialog` with `CssClass="bg-slate-900 border border-sla
 
 ---
 
+### 5.7 SVG Icon Components
+
+Never embed raw `<svg>` tags inline within pages, layouts, or feature components. Instead:
+- Create dedicated icon components in `NetWorthTracker.UI/Components/Icons/`.
+- Name icon components in PascalCase ending with `Icon` (e.g. `AccountIcon.razor`, `ChevronLeftIcon.razor`, `ChevronRightIcon.razor`, `CopyIcon.razor`, `DashboardIcon.razor`).
+- Standardize size and stroke classes (such as `h-4 w-4 shrink-0`, `fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"`).
+- Consume via `@using NetWorthTracker.UI.Components.Icons` (included in `_Imports.razor`):
+  ```razor
+  <button type="button" aria-label="Previous month" class="...">
+      <ChevronLeftIcon />
+  </button>
+  ```
+
+---
+
 ## 6. Checklist for AI Agents & Developers
 
 When creating or modifying UI components:
@@ -271,6 +293,7 @@ When creating or modifying UI components:
 - [ ] Follows Tailwind dark-theme palette (`bg-slate-900`, `bg-slate-950`, `border-slate-800`).
 - [ ] Financial metrics use `font-mono`, `C2` formatting, and semantic colors (`emerald-400` for assets, `rose-400` for liabilities, `indigo-400` for net worth).
 - [ ] Dates use `MonthYearPicker` with standard `MMM yyyy` or `MMMM yyyy` formatting.
+- [ ] SVGs are encapsulated as dedicated components in the `Components/Icons/` folder (never inlined in templates).
 - [ ] Input labels follow uppercase tracking (`text-xs font-semibold text-slate-400 uppercase tracking-wider`).
 - [ ] Buttons follow primary (`indigo-600`), ghost (`text-slate-400 hover:text-white`), or table action (`indigo-950/60`) styles.
 - [ ] Responsive design implemented with `sm:` breakpoints for desktop and mobile layouts.
