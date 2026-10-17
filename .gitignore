@@ -20,3 +20,4 @@ wwwroot/css/app.css
 *.csv
 *.sql
 wwwroot/css/app.css
+*.received.*

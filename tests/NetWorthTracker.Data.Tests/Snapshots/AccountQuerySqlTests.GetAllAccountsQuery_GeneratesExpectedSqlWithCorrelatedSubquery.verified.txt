@@ -1,0 +1,7 @@
+﻿SELECT "a"."Id", "a"."Name", "a"."Type", "a"."OpenDate", "a"."ClosedDate", (
+    SELECT "m"."Amount"
+    FROM "monthly_balances" AS "m"
+    WHERE "m"."AccountId" = "a"."Id" AND "m"."MonthDate" = @__selectedDate_0
+    LIMIT 1) AS "BalanceOnDate"
+FROM "accounts" AS "a"
+ORDER BY "a"."Id"

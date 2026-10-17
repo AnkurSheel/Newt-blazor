@@ -1,0 +1,22 @@
+﻿SELECT "m"."MonthDate", (
+    SELECT COALESCE(ef_sum(CASE
+        WHEN "a1"."Type" = 1 THEN "m0"."Amount"
+        ELSE '0.0'
+    END), '0.0')
+    FROM "monthly_balances" AS "m0"
+    INNER JOIN "accounts" AS "a0" ON "m0"."AccountId" = "a0"."Id"
+    INNER JOIN "accounts" AS "a1" ON "m0"."AccountId" = "a1"."Id"
+    WHERE "m0"."MonthDate" <= @__selectedDate_0 AND "a0"."OpenDate" <= "m0"."MonthDate" AND ("a0"."ClosedDate" IS NULL OR "a0"."ClosedDate" > "m0"."MonthDate") AND "m"."MonthDate" = "m0"."MonthDate"), (
+    SELECT COALESCE(ef_sum(CASE
+        WHEN "a3"."Type" = 2 THEN "m1"."Amount"
+        ELSE '0.0'
+    END), '0.0')
+    FROM "monthly_balances" AS "m1"
+    INNER JOIN "accounts" AS "a2" ON "m1"."AccountId" = "a2"."Id"
+    INNER JOIN "accounts" AS "a3" ON "m1"."AccountId" = "a3"."Id"
+    WHERE "m1"."MonthDate" <= @__selectedDate_0 AND "a2"."OpenDate" <= "m1"."MonthDate" AND ("a2"."ClosedDate" IS NULL OR "a2"."ClosedDate" > "m1"."MonthDate") AND "m"."MonthDate" = "m1"."MonthDate")
+FROM "monthly_balances" AS "m"
+INNER JOIN "accounts" AS "a" ON "m"."AccountId" = "a"."Id"
+WHERE "m"."MonthDate" <= @__selectedDate_0 AND "a"."OpenDate" <= "m"."MonthDate" AND ("a"."ClosedDate" IS NULL OR "a"."ClosedDate" > "m"."MonthDate")
+GROUP BY "m"."MonthDate"
+ORDER BY "m"."MonthDate"

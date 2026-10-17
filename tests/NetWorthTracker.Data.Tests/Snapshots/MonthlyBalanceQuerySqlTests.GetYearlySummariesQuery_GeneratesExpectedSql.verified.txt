@@ -1,0 +1,49 @@
+﻿SELECT "m"."MonthDate", (
+    SELECT COALESCE(ef_sum(CASE
+        WHEN "a3"."Type" = 1 THEN "m1"."Amount"
+        ELSE '0.0'
+    END), '0.0')
+    FROM "monthly_balances" AS "m1"
+    INNER JOIN "accounts" AS "a1" ON "m1"."AccountId" = "a1"."Id"
+    INNER JOIN "accounts" AS "a3" ON "m1"."AccountId" = "a3"."Id"
+    WHERE "m1"."MonthDate" <= @__selectedDate_0 AND "a1"."OpenDate" <= "m1"."MonthDate" AND ("a1"."ClosedDate" IS NULL OR "a1"."ClosedDate" > "m1"."MonthDate") AND "m1"."MonthDate" IN (
+        SELECT MAX("s0"."MonthDate")
+        FROM (
+            SELECT "m2"."MonthDate", CAST(strftime('%Y', "m2"."MonthDate") AS INTEGER) AS "Key"
+            FROM "monthly_balances" AS "m2"
+            INNER JOIN "accounts" AS "a2" ON "m2"."AccountId" = "a2"."Id"
+            WHERE "m2"."MonthDate" <= @__selectedDate_0 AND "a2"."OpenDate" <= "m2"."MonthDate" AND ("a2"."ClosedDate" IS NULL OR "a2"."ClosedDate" > "m2"."MonthDate")
+        ) AS "s0"
+        GROUP BY "s0"."Key"
+    ) AND "m"."MonthDate" = "m1"."MonthDate"), (
+    SELECT COALESCE(ef_sum(CASE
+        WHEN "a6"."Type" = 2 THEN "m3"."Amount"
+        ELSE '0.0'
+    END), '0.0')
+    FROM "monthly_balances" AS "m3"
+    INNER JOIN "accounts" AS "a4" ON "m3"."AccountId" = "a4"."Id"
+    INNER JOIN "accounts" AS "a6" ON "m3"."AccountId" = "a6"."Id"
+    WHERE "m3"."MonthDate" <= @__selectedDate_0 AND "a4"."OpenDate" <= "m3"."MonthDate" AND ("a4"."ClosedDate" IS NULL OR "a4"."ClosedDate" > "m3"."MonthDate") AND "m3"."MonthDate" IN (
+        SELECT MAX("s1"."MonthDate")
+        FROM (
+            SELECT "m4"."MonthDate", CAST(strftime('%Y', "m4"."MonthDate") AS INTEGER) AS "Key"
+            FROM "monthly_balances" AS "m4"
+            INNER JOIN "accounts" AS "a5" ON "m4"."AccountId" = "a5"."Id"
+            WHERE "m4"."MonthDate" <= @__selectedDate_0 AND "a5"."OpenDate" <= "m4"."MonthDate" AND ("a5"."ClosedDate" IS NULL OR "a5"."ClosedDate" > "m4"."MonthDate")
+        ) AS "s1"
+        GROUP BY "s1"."Key"
+    ) AND "m"."MonthDate" = "m3"."MonthDate")
+FROM "monthly_balances" AS "m"
+INNER JOIN "accounts" AS "a" ON "m"."AccountId" = "a"."Id"
+WHERE "m"."MonthDate" <= @__selectedDate_0 AND "a"."OpenDate" <= "m"."MonthDate" AND ("a"."ClosedDate" IS NULL OR "a"."ClosedDate" > "m"."MonthDate") AND "m"."MonthDate" IN (
+    SELECT MAX("s"."MonthDate")
+    FROM (
+        SELECT "m0"."MonthDate", CAST(strftime('%Y', "m0"."MonthDate") AS INTEGER) AS "Key"
+        FROM "monthly_balances" AS "m0"
+        INNER JOIN "accounts" AS "a0" ON "m0"."AccountId" = "a0"."Id"
+        WHERE "m0"."MonthDate" <= @__selectedDate_0 AND "a0"."OpenDate" <= "m0"."MonthDate" AND ("a0"."ClosedDate" IS NULL OR "a0"."ClosedDate" > "m0"."MonthDate")
+    ) AS "s"
+    GROUP BY "s"."Key"
+)
+GROUP BY "m"."MonthDate"
+ORDER BY "m"."MonthDate"
