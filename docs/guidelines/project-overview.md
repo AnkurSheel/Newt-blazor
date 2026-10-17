@@ -93,6 +93,9 @@ Contains all core data models, DTOs (Data Transfer Objects), enums, and exceptio
    - Keep business logic inside `Services`, leaving UI components focused purely on presentation and user interaction.
    - Use asynchronous programming (`async`/`await`) for all I/O and database operations.
 
+4. **Testing Standards:**
+   - Follow the [Testing Guidelines for AI Agents](testing-guidelines.md) for test naming conventions, Arrange-Act-Assert structure, minimal setup, property-level assertions, and bUnit/xUnit practices.
+
 ---
 
 ## 5. Building and Testing
