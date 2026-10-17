@@ -25,9 +25,6 @@ public partial class AddMonthlyBalanceModal
     public decimal StartingBalance { get; set; }
 
     [Parameter]
-    public decimal StartingDate { get; set; }
-
-    [Parameter]
     public EventCallback OnTransactionSaved { get; set; }
 
     private string MaxMonth => DateTime.Now.ToString("yyyy-MM");
@@ -36,6 +33,18 @@ public partial class AddMonthlyBalanceModal
     {
         _balance = StartingBalance;
         _transactionDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1));
+    }
+
+    private async Task CopyBalanceFromLastMonthAsync()
+    {
+        if (_transactionDate == null)
+        {
+            return;
+        }
+
+        var lastMonthDate = _transactionDate.Value.AddMonths(-1);
+        var lastMonthBalance = await MonthlyBalanceService.GetBalanceByDateAsync(AccountId, lastMonthDate);
+        _balance = lastMonthBalance ?? 0.0m;
     }
 
     private void OnMonthChanged(ChangeEventArgs e)

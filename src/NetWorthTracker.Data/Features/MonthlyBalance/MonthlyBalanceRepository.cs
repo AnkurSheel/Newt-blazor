@@ -24,6 +24,16 @@ public class MonthlyBalanceRepository : IMonthlyBalanceRepository
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task<decimal?> GetBalanceByDateAsync(int accountId, DateOnly monthDate)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+        return await dbContext.MonthlyBalances.AsNoTracking()
+            .Where(mb => mb.AccountId == accountId && mb.MonthDate == monthDate)
+            .Select(mb => (decimal?)mb.Amount)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<MonthlySummaryDTO> GetMonthlySummaryAsync(DateOnly selectedDate)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();

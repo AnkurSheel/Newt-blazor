@@ -17,4 +17,9 @@ public class MonthlyBalanceService : IMonthlyBalanceService
     {
         await _repository.AddAsync(monthlyBalance);
     }
+
+    public async Task<decimal?> GetBalanceByDateAsync(int accountId, DateOnly monthDate)
+    {
+        return await _repository.GetBalanceByDateAsync(accountId, monthDate);
+    }
 }

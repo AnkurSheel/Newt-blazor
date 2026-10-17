@@ -27,8 +27,16 @@
 
                 <!-- Balance Input -->
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Balance
-                        Amount</label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Balance
+                            Amount</label>
+                        <button type="button"
+                                @onclick="CopyBalanceFromLastMonthAsync"
+                                class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1 cursor-pointer">
+                            <CopyIcon/>
+                            <span>Copy balance from last month</span>
+                        </button>
+                    </div>
                     <input type="number" step="0.01" @bind="_balance"
                            class="w-full bg-slate-950 border border-slate-800 text-slate-100 font-mono rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"/>
                 </div>
