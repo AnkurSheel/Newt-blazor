@@ -29,10 +29,9 @@ public class AccountRepository : IAccountRepository
                 Type = accountEntity.Type,
                 OpenDate = accountEntity.OpenDate,
                 ClosedDate = accountEntity.ClosedDate,
-                LatestBalance = dbContext.MonthlyBalances
+                BalanceOnDate = dbContext.MonthlyBalances
                     .Where(mb => mb.AccountId == accountEntity.Id && mb.MonthDate == selectedDate)
-                    .OrderByDescending(mb => mb.MonthDate)
-                    .Select(mb => mb.Amount)
+                    .Select(mb => (decimal?)mb.Amount)
                     .FirstOrDefault()
             })
             .ToListAsync();

@@ -121,16 +121,23 @@
                     </Template>
                 </GridColumn>
 
-                <!-- Latest Balance -->
-                <GridColumn Field="@nameof(AccountResponseDTO.LatestBalance)" HeaderText="Latest Balance"
+                <!-- Balance -->
+                <GridColumn Field="@nameof(AccountResponseDTO.BalanceOnDate)" HeaderText="Balance"
                             TextAlign="TextAlign.Right" Width="20%">
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            <span
-                                class="font-mono text-sm font-semibold @(item.Type == AccountType.LIABILITY ? "text-rose-400" : "text-emerald-400")">
-                                @(item.LatestBalance.ToString("C2"))
-                            </span>
+                            if (item.BalanceOnDate.HasValue)
+                            {
+                                <span
+                                    class="font-mono text-sm font-semibold @(item.Type == AccountType.LIABILITY ? "text-rose-400" : "text-emerald-400")">
+                                    @(item.BalanceOnDate.Value.ToString("C2"))
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="font-mono text-xs text-slate-500 italic">No Data</span>
+                            }
                         }
                     </Template>
                 </GridColumn>
@@ -142,7 +149,9 @@
                             if (!item.IsClosedOn(SelectedDate))
                             {
                                 <button @onclick="() => OpenAddTransactionModal(item)"
-                                        class="px-2.5 py-1 text-xs font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 hover:bg-indigo-900/80 rounded-md transition inline-flex items-center gap-1">
+                                        disabled="@item.BalanceOnDate.HasValue"
+                                        title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
+                                        class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 hover:bg-indigo-900/80 cursor-pointer disabled:bg-slate-900 disabled:border-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed disabled:opacity-50">
                                     <span>+ Txn</span>
                                 </button>
                             }
@@ -162,6 +171,6 @@
     <AddMonthlyBalanceModal @bind-IsVisible="_isTransactionModalOpen"
                             AccountId="@(_selectedAccountForTransaction?.Id ?? 0)"
                             AccountName="@(_selectedAccountForTransaction?.Name ?? string.Empty)"
-                            StartingBalance="@(_selectedAccountForTransaction?.LatestBalance ?? 0m)"
+                            StartingBalance="@(_selectedAccountForTransaction?.BalanceOnDate ?? 0m)"
                             OnTransactionSaved="Refresh"/>
 </div>

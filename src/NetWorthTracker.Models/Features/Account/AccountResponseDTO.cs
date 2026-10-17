@@ -12,7 +12,7 @@ public record AccountResponseDTO
 
     public DateOnly OpenDate { get; init; }
 
-    public required decimal LatestBalance { get; init; }
+    public decimal? BalanceOnDate { get; init; }
 
     public bool IsClosedOn(DateOnly targetDate)
     {

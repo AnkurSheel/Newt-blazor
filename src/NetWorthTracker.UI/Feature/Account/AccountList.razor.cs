@@ -31,7 +31,7 @@ public partial class AccountList
 
     private void OpenAddTransactionModal(AccountResponseDTO account)
     {
-        if (account.IsClosedOn(DateOnly.FromDateTime(DateTime.Now)))
+        if (account.IsClosedOn(SelectedDate) || account.BalanceOnDate.HasValue)
         {
             return;
         }
