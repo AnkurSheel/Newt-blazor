@@ -113,27 +113,38 @@ jobs:
       version: ${{ needs.getVersionFromGit.outputs.buildVersion }}
     secrets: inherit
 
-  deployWindowsRelease:
-    name: Deploy Windows Release
+  publishRelease:
+    name: Publish GitHub Release
     needs: [ getVersionFromGit, buildForWindows ]
     runs-on: ubuntu-latest
     if: |
       always() &&
-      needs.buildForWindows.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
       (github.event.inputs.release_windows == 'true' || github.event.action == 'published')
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-Windows
           path: dist
 
+      - name: Extract Release Notes from CHANGELOG
+        id: changelog
+        run: |
+          chmod +x ./scripts/extract_changelog.sh
+          ./scripts/extract_changelog.sh "${{ needs.getVersionFromGit.outputs.tagVersion }}" "release_notes.md"
+
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.getVersionFromGit.outputs.tagVersion }}
           name: Release ${{ needs.getVersionFromGit.outputs.tagVersion }}
+          body_path: release_notes.md
           draft: false
           prerelease: false
           files: |
