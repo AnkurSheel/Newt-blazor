@@ -12,7 +12,7 @@ on:
 
 jobs:
   build_windows:
-    name: Build & Package MSIX (Windows)
+    name: Build & Package MSIX
     runs-on: windows-latest
 
     steps:
@@ -40,8 +40,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Cache MAUI Workload
+        id: cache-maui-workload
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Program Files\dotnet\packs
+            C:\Program Files\dotnet\sdk-manifests
+            C:\Program Files\dotnet\template-packs
+            C:\Program Files\dotnet\metadata
+          key: ${{ runner.os }}-maui-workload-net9-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-maui-workload-net9-
+
       - name: Install MAUI Workload
-        run: dotnet workload install maui-windows
+        if: steps.cache-maui-workload.outputs.cache-hit != 'true'
+        run: dotnet workload install maui-windows --skip-manifest-update
 
       - name: Configure Code Signing Certificate
         id: cert_setup
@@ -50,42 +64,33 @@ jobs:
           WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_BASE64)) {
+              Write-Error "Certificate secret WINDOWS_CERTIFICATE_BASE64 was not found."
+              exit 1
+          }
+
           $stagingDir = "$PWD/dist"
           New-Item -ItemType Directory -Force -Path $stagingDir | Out-Null
           
-          if (-not [string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_BASE64)) {
-              Write-Host "Importing certificate from GitHub Secrets..."
-              $certBytes = [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64)
-              $pfxPath = "$stagingDir/cert.pfx"
-              [System.IO.File]::WriteAllBytes($pfxPath, $certBytes)
-              
-              $pfx = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
-                  $pfxPath,
-                  $env:WINDOWS_CERTIFICATE_PASSWORD,
-                  [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
-              )
-              
-              $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("My", "CurrentUser")
-              $store.Open("ReadWrite")
-              $store.Add($pfx)
-              $store.Close()
-              
-              $thumbprint = $pfx.Thumbprint
-              $cerBytes = $pfx.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
-              [System.IO.File]::WriteAllBytes("$stagingDir/NetWorthTracker.cer", $cerBytes)
-          } else {
-              Write-Host "No certificate secret found. Generating self-signed certificate for build..."
-              $cert = New-SelfSignedCertificate `
-                  -Type Custom `
-                  -Subject "CN=GLHF" `
-                  -KeyUsage DigitalSignature `
-                  -FriendlyName "Newt Dev Cert" `
-                  -CertStoreLocation "Cert:\CurrentUser\My" `
-                  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
-              
-              $thumbprint = $cert.Thumbprint
-              Export-Certificate -Cert $cert -FilePath "$stagingDir/NetWorthTracker.cer" | Out-Null
-          }
+          Write-Host "Importing certificate from GitHub Secrets..."
+          $certBytes = [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64)
+          $pfxPath = "$stagingDir/cert.pfx"
+          [System.IO.File]::WriteAllBytes($pfxPath, $certBytes)
+          
+          $pfx = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
+              $pfxPath,
+              $env:WINDOWS_CERTIFICATE_PASSWORD,
+              [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
+          )
+          
+          $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("My", "CurrentUser")
+          $store.Open("ReadWrite")
+          $store.Add($pfx)
+          $store.Close()
+          
+          $thumbprint = $pfx.Thumbprint
+          $cerBytes = $pfx.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+          [System.IO.File]::WriteAllBytes("$stagingDir/NetWorthTracker.cer", $cerBytes)
           
           Write-Host "Certificate Thumbprint: $thumbprint"
           "THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV

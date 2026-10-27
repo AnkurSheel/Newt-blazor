@@ -60,14 +60,43 @@ if [ -n "$INCREMENT_VERSION" ]; then
 
   echo "New calculated version: $new_version ($tag_version)"
 
+  # Automatically update CHANGELOG.md if present
+  if [ -f "CHANGELOG.md" ]; then
+    echo "Updating CHANGELOG.md for $new_version..."
+    today=$(date +%Y-%m-%d)
+    
+    # Check if version is already recorded in CHANGELOG.md
+    if ! grep -q "## \[$new_version\]" CHANGELOG.md && ! grep -q "## $new_version" CHANGELOG.md; then
+      # Replace '## [Unreleased]' with '## [Unreleased]\n\n## [new_version] - YYYY-MM-DD'
+      sed -i.bak -E "s/## *\[Unreleased\]/## [Unreleased]\n\n## [$new_version] - $today/" CHANGELOG.md
+      rm -f CHANGELOG.md.bak
+      echo "CHANGELOG.md updated successfully with version [$new_version] - $today."
+    fi
+  fi
+
+  git config user.name "github-actions[bot]"
+  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+  # Commit CHANGELOG.md changes if any exist
+  if ! git diff --quiet CHANGELOG.md 2>/dev/null; then
+    echo "Committing updated CHANGELOG.md..."
+    git add CHANGELOG.md
+    git commit -m "chore(release): update CHANGELOG for $tag_version [skip ci]"
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$current_branch" = "HEAD" ] && [ -n "$GITHUB_REF_NAME" ]; then
+      current_branch="$GITHUB_REF_NAME"
+    fi
+    if [ -n "$current_branch" ] && [ "$current_branch" != "HEAD" ]; then
+      git push origin "HEAD:$current_branch" || echo "Warning: could not push branch $current_branch to origin"
+    fi
+  fi
+
   if git rev-parse "$tag_version" >/dev/null 2>&1; then
     commit_hash=$(git rev-parse --short HEAD)
     tag_version="${tag_version}-${commit_hash}"
     echo "Tag $tag_version already exists. Using tag with commit hash."
   else
     echo "Tagging new version $tag_version."
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
     git tag "$tag_version"
     git push origin "$tag_version" || echo "Warning: could not push tag to origin"
   fi

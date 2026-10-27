@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   test:
-    name: Build & Test (Linux)
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -79,14 +79,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Run Data Tests
-        run: dotnet test tests/NetWorthTracker.Data.Tests/NetWorthTracker.Data.Tests.csproj --configuration Release --verbosity normal
-
-      - name: Run UI Tests
-        run: dotnet test tests/NetWorthTracker.UI.Tests/NetWorthTracker.UI.Tests.csproj --configuration Release --verbosity normal
+      - name: Run Tests
+        run: dotnet test NetWorthTracker.Tests.slnf --configuration Release --verbosity normal
 
   getVersionFromGit:
-    name: Get Git Version (Linux)
+    name: Get Git Version
     runs-on: ubuntu-latest
     outputs:
       buildVersion: ${{ steps.getVersion.outputs.buildVersion }}
@@ -116,30 +113,50 @@ jobs:
       version: ${{ needs.getVersionFromGit.outputs.buildVersion }}
     secrets: inherit
 
-  deployWindowsRelease:
-    name: Deploy Windows Release (Linux)
+  publishRelease:
+    name: Publish GitHub Release
     needs: [ getVersionFromGit, buildForWindows ]
     runs-on: ubuntu-latest
     if: |
       always() &&
-      needs.buildForWindows.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
       (github.event.inputs.release_windows == 'true' || github.event.action == 'published')
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-Windows
           path: dist
 
+      - name: Extract Release Notes from CHANGELOG
+        id: changelog
+        run: |
+          chmod +x ./scripts/extract_changelog.sh
+          ./scripts/extract_changelog.sh "${{ needs.getVersionFromGit.outputs.tagVersion }}" "release_notes.md"
+
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.getVersionFromGit.outputs.tagVersion }}
           name: Release ${{ needs.getVersionFromGit.outputs.tagVersion }}
+          body_path: release_notes.md
           draft: false
           prerelease: false
           files: |
             dist/*.msix
             dist/*.cer
           generate_release_notes: true
+
+      - name: Cleanup to avoid storage limit
+        uses: geekyeggo/delete-artifact@v6
+        if: always()
+        with:
+          name: |
+            build-Windows
+            tailwind-css
+          failOnError: false
