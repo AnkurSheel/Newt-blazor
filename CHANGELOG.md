@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0.0] - 2026-10-27
+
 ### Added
 - **Net Worth Dashboard:** Real-time calculation and overview of total net worth, total assets, and total liabilities.
 - **Account Management:** Create, edit, and organize accounts across various asset and liability categories (cash, savings, investments, crypto, loans, and credit cards).
