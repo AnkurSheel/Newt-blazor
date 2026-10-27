@@ -40,8 +40,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Cache MAUI Workload
+        id: cache-maui-workload
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Program Files\dotnet\packs
+            C:\Program Files\dotnet\sdk-manifests
+            C:\Program Files\dotnet\template-packs
+            C:\Program Files\dotnet\metadata
+          key: ${{ runner.os }}-maui-workload-net9-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-maui-workload-net9-
+
       - name: Install MAUI Workload
-        run: dotnet workload install maui-windows
+        if: steps.cache-maui-workload.outputs.cache-hit != 'true'
+        run: dotnet workload install maui-windows --skip-manifest-update
 
       - name: Configure Code Signing Certificate
         id: cert_setup
