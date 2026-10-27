@@ -79,11 +79,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Run Data Tests
-        run: dotnet test tests/NetWorthTracker.Data.Tests/NetWorthTracker.Data.Tests.csproj --configuration Release --verbosity normal
-
-      - name: Run UI Tests
-        run: dotnet test tests/NetWorthTracker.UI.Tests/NetWorthTracker.UI.Tests.csproj --configuration Release --verbosity normal
+      - name: Run Tests
+        run: dotnet test --configuration Release --verbosity normal
 
   getVersionFromGit:
     name: Get Git Version
