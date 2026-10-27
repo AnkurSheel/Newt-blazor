@@ -1,0 +1,140 @@
+name: Build Windows
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    outputs:
+      buildVersion:
+        value: ${{ inputs.version }}
+
+jobs:
+  build_windows:
+    name: Build & Package MSIX (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Tailwind CSS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tailwind-css
+          path: src/NetWorthTracker.UI/wwwroot/css
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Cache NuGet Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            C:\Users\runneradmin\.nuget\packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Install MAUI Workload
+        run: dotnet workload install maui-windows
+
+      - name: Configure Code Signing Certificate
+        id: cert_setup
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          $stagingDir = "$PWD/dist"
+          New-Item -ItemType Directory -Force -Path $stagingDir | Out-Null
+          
+          if (-not [string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_BASE64)) {
+              Write-Host "Importing certificate from GitHub Secrets..."
+              $certBytes = [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64)
+              $pfxPath = "$stagingDir/cert.pfx"
+              [System.IO.File]::WriteAllBytes($pfxPath, $certBytes)
+              
+              $pfx = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
+                  $pfxPath,
+                  $env:WINDOWS_CERTIFICATE_PASSWORD,
+                  [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable -bor [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
+              )
+              
+              $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("My", "CurrentUser")
+              $store.Open("ReadWrite")
+              $store.Add($pfx)
+              $store.Close()
+              
+              $thumbprint = $pfx.Thumbprint
+              $cerBytes = $pfx.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+              [System.IO.File]::WriteAllBytes("$stagingDir/NetWorthTracker.cer", $cerBytes)
+          } else {
+              Write-Host "No certificate secret found. Generating self-signed certificate for build..."
+              $cert = New-SelfSignedCertificate `
+                  -Type Custom `
+                  -Subject "CN=GLHF" `
+                  -KeyUsage DigitalSignature `
+                  -FriendlyName "Newt Dev Cert" `
+                  -CertStoreLocation "Cert:\CurrentUser\My" `
+                  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
+              
+              $thumbprint = $cert.Thumbprint
+              Export-Certificate -Cert $cert -FilePath "$stagingDir/NetWorthTracker.cer" | Out-Null
+          }
+          
+          Write-Host "Certificate Thumbprint: $thumbprint"
+          "THUMBPRINT=$thumbprint" >> $env:GITHUB_ENV
+
+      - name: Update Package Manifest Version
+        shell: pwsh
+        run: |
+          $manifestPath = "src/NetWorthTracker.App/Platforms/Windows/Package.appxmanifest"
+          $buildVer = "${{ inputs.version }}"
+          Write-Host "Updating $manifestPath version to $buildVer"
+          [xml]$manifest = Get-Content $manifestPath
+          $manifest.Package.Identity.Version = $buildVer
+          $manifest.Save((Resolve-Path $manifestPath))
+
+      - name: Build & Publish MSIX Package
+        shell: pwsh
+        run: |
+          $buildVer = "${{ inputs.version }}"
+          dotnet publish src/NetWorthTracker.App/NetWorthTracker.App.csproj `
+            -f net9.0-windows10.0.19041.0 `
+            -c Release `
+            /p:WindowsPackageType=MSIX `
+            /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxPackageSigningEnabled=true `
+            /p:PackageCertificateThumbprint="$env:THUMBPRINT" `
+            /p:ApplicationDisplayVersion="$buildVer" `
+            /p:ApplicationVersion="$buildVer"
+
+      - name: Collect and Rename Build Artifacts
+        shell: pwsh
+        run: |
+          $buildVer = "${{ inputs.version }}"
+          $packagesDir = "src/NetWorthTracker.App/bin/Release/net9.0-windows10.0.19041.0/win10-x64/AppPackages"
+          $msix = Get-ChildItem -Path $packagesDir -Filter "*.msix" -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          
+          if ($null -eq $msix) {
+              Write-Error "No .msix file found in $packagesDir"
+              exit 1
+          }
+          
+          $targetName = "NetWorthTracker-$buildVer.msix"
+          Copy-Item -Path $msix.FullName -Destination "dist/$targetName"
+          Write-Host "Staged $targetName to dist/"
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-Windows
+          path: |
+            dist/*.msix
+            dist/*.cer
+          retention-days: 14
