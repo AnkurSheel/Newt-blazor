@@ -105,6 +105,22 @@ jobs:
           $manifest.Package.Identity.Version = $buildVer
           $manifest.Save((Resolve-Path $manifestPath))
 
+      - name: Configure Syncfusion License Key
+        shell: pwsh
+        env:
+          SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY || secrets.SYNCFUSION_KEY }}
+        run: |
+          if (-not [string]::IsNullOrWhiteSpace($env:SYNCFUSION_LICENSE_KEY)) {
+              Write-Host "Injecting Syncfusion license key into appsettings.json..."
+              $appSettingsPath = "src/NetWorthTracker.App/appsettings.json"
+              $json = Get-Content -Raw -Path $appSettingsPath | ConvertFrom-Json
+              $json | Add-Member -NotePropertyName "Syncfusion" -NotePropertyValue ([PSCustomObject]@{ LicenseKey = $env:SYNCFUSION_LICENSE_KEY }) -Force
+              $json | ConvertTo-Json -Depth 10 | Set-Content -Path $appSettingsPath
+              Write-Host "Syncfusion license key successfully injected."
+          } else {
+              Write-Warning "SYNCFUSION_LICENSE_KEY secret not found or empty. Syncfusion license will not be registered."
+          }
+
       - name: Build & Publish MSIX Package
         shell: pwsh
         run: |
