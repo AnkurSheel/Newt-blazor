@@ -12,7 +12,7 @@ on:
 
 jobs:
   build_windows:
-    name: Build & Package MSIX (Windows)
+    name: Build & Package MSIX
     runs-on: windows-latest
 
     steps:
