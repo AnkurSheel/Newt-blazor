@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   test:
-    name: Build & Test (Linux)
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -86,7 +86,7 @@ jobs:
         run: dotnet test tests/NetWorthTracker.UI.Tests/NetWorthTracker.UI.Tests.csproj --configuration Release --verbosity normal
 
   getVersionFromGit:
-    name: Get Git Version (Linux)
+    name: Get Git Version
     runs-on: ubuntu-latest
     outputs:
       buildVersion: ${{ steps.getVersion.outputs.buildVersion }}
@@ -117,7 +117,7 @@ jobs:
     secrets: inherit
 
   deployWindowsRelease:
-    name: Deploy Windows Release (Linux)
+    name: Deploy Windows Release
     needs: [ getVersionFromGit, buildForWindows ]
     runs-on: ubuntu-latest
     if: |
