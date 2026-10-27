@@ -19,5 +19,7 @@ wwwroot/css/app.css
 *.db
 *.csv
 *.sql
-wwwroot/css/app.css
+**/wwwroot/css/app.css
 *.received.*
+*.cer
+.output.txt
