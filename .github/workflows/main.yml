@@ -140,3 +140,12 @@ jobs:
             dist/*.msix
             dist/*.cer
           generate_release_notes: true
+
+      - name: Cleanup to avoid storage limit
+        uses: geekyeggo/delete-artifact@v6
+        if: always()
+        with:
+          name: |
+            build-Windows
+            tailwind-css
+          failOnError: false
