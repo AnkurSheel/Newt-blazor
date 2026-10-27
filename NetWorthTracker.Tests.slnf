@@ -1,0 +1,17 @@
+﻿{
+  "solution": {
+    "path": "NetWorthTracker.sln",
+    "projects": [
+      "src\\NetWorthTracker.Common\\NetWorthTracker.Common.csproj",
+      "src\\NetWorthTracker.Data.Api\\NetWorthTracker.Data.Api.csproj",
+      "src\\NetWorthTracker.Data\\NetWorthTracker.Data.csproj",
+      "src\\NetWorthTracker.Models\\NetWorthTracker.Models.csproj",
+      "src\\NetWorthTracker.Seeder\\NetWorthTracker.Seeder.csproj",
+      "src\\NetWorthTracker.Services.Api\\NetWorthTracker.Services.Api.csproj",
+      "src\\NetWorthTracker.Services\\NetWorthTracker.Services.csproj",
+      "src\\NetWorthTracker.UI\\NetWorthTracker.UI.csproj",
+      "tests\\NetWorthTracker.Data.Tests\\NetWorthTracker.Data.Tests.csproj",
+      "tests\\NetWorthTracker.UI.Tests\\NetWorthTracker.UI.Tests.csproj"
+    ]
+  }
+}

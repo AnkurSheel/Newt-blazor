@@ -80,7 +80,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Run Tests
-        run: dotnet test --configuration Release --verbosity normal
+        run: dotnet test NetWorthTracker.Tests.slnf --configuration Release --verbosity normal
 
   getVersionFromGit:
     name: Get Git Version
