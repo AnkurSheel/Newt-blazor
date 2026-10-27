@@ -1,11 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 using DiffEngine;
 
 namespace NetWorthTracker.Data.Tests;
 
-public static class VerifySettings
+public static partial class VerifySettings
 {
+    [GeneratedRegex(@"@__\w*locals\d+_")]
+    private static partial Regex ClosureParameterRegex();
+
     [ModuleInitializer]
     public static void Initialize()
     {
@@ -15,6 +19,9 @@ public static class VerifySettings
             type,
             method
         ) => new PathInfo(Path.Combine(projectDirectory, "Snapshots"), type.Name, method.Name));
+
+        VerifierSettings.ScrubLinesWithReplace(line => ClosureParameterRegex()
+            .Replace(line, "@__"));
 
         DiffRunner.Disabled = true;
         VerifierSettings.OnFirstVerify(filePair =>
