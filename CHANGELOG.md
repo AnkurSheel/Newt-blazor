@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Syncfusion license key error shows on all pages.
+
+### Changed
+- Updated `actions/cache` GitHub Actions dependency from v4 to v6 across CI workflows.
+- Updated Rider IDE project settings.
+
 ## [0.1.0.0] - 2026-10-27
 
 ### Added
