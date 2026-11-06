@@ -7,7 +7,7 @@ namespace NetWorthTracker.Data.Tests;
 
 public static partial class VerifySettings
 {
-    [GeneratedRegex(@"@__\w*locals\d+_")]
+    [GeneratedRegex(@"@_+\w*locals\d+_")]
     private static partial Regex ClosureParameterRegex();
 
     [ModuleInitializer]
