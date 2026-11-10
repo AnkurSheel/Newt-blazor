@@ -60,7 +60,7 @@ jobs:
         run: npm run build:css:minify
 
       - name: Upload Tailwind CSS Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tailwind-css
           path: src/NetWorthTracker.UI/wwwroot/css/app.css
