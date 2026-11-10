@@ -140,7 +140,7 @@ jobs:
           ./scripts/extract_changelog.sh "${{ needs.getVersionFromGit.outputs.tagVersion }}" "release_notes.md"
 
       - name: Create or Update GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.getVersionFromGit.outputs.tagVersion }}
           name: Release ${{ needs.getVersionFromGit.outputs.tagVersion }}
