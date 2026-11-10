@@ -4,8 +4,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.20" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.14"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14"/>
         <PackageReference Include="Syncfusion.Blazor.Calendars" Version="34.2.5"/>
         <PackageReference Include="Syncfusion.Blazor.Charts" Version="34.2.5"/>
         <PackageReference Include="Syncfusion.Licensing" Version="34.2.5" />

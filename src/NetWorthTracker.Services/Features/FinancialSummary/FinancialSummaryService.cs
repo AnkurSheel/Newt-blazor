@@ -46,6 +46,11 @@ public class FinancialSummaryService : IFinancialSummaryService
         IReadOnlyList<MonthlySummaryDTO> monthlySummaries =
             await _monthlyBalanceRepository.GetMonthlySummariesAsync(selectedDate);
 
+        if (monthlySummaries.Count == 0)
+        {
+            return Array.Empty<TrendDTO>();
+        }
+
         var trends = new List<TrendDTO>();
         var monthlySummary = monthlySummaries[0];
         trends.Add(new TrendDTO(monthlySummary.SelectedDate, monthlySummary.NetWorth, 0, 0));
@@ -68,6 +73,11 @@ public class FinancialSummaryService : IFinancialSummaryService
     {
         IReadOnlyList<MonthlySummaryDTO> yearlySummaries =
             await _monthlyBalanceRepository.GetYearlySummariesAsync(selectedDate);
+
+        if (yearlySummaries.Count == 0)
+        {
+            return Array.Empty<TrendDTO>();
+        }
 
         var trends = new List<TrendDTO>();
         var yearlySummary = yearlySummaries[0];

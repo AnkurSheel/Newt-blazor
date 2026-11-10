@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +27,27 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
 
-#if DEBUG
-        builder.Services.AddBlazorWebViewDeveloperTools();
-        builder.Logging.AddDebug();
-#endif
+        if (builder.Configuration.GetValue<bool>("EnableDeveloperTools"))
+        {
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
+        }
+
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+        builder.Logging.AddConsole();
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+        {
+            var exception = args.ExceptionObject as Exception;
+            Debug.WriteLine(
+                $"[GLOBAL ERROR] AppDomain Unhandled Exception: {exception?.ToString() ?? args.ExceptionObject?.ToString()}");
+        };
+
+        TaskScheduler.UnobservedTaskException += (sender, args) =>
+        {
+            Debug.WriteLine($"[GLOBAL ERROR] Unobserved Task Exception: {args.Exception}");
+            args.SetObserved();
+        };
 
         MauiRegistry.ConfigureServices(builder);
         ServiceRegistry.ConfigureServices(builder.Services, builder.Configuration);
