@@ -38,8 +38,12 @@
         <CascadingValue Value="@_selectedDate">
             <div class="min-h-screen w-full flex flex-col bg-slate-900 text-slate-100 font-sans">
                 <main class="flex-1 p-4 sm:p-8 overflow-x-hidden space-y-6">
-                    <FinancialSummaryContainer/>
-                    @Body
+                    <AppErrorBoundary>
+                        <FinancialSummaryContainer/>
+                    </AppErrorBoundary>
+                    <AppErrorBoundary>
+                        @Body
+                    </AppErrorBoundary>
                 </main>
             </div>
         </CascadingValue>
