@@ -4,6 +4,7 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea/
+*.sln.DotSettings.user
 node_modules/
 .env
 .env.*
@@ -23,3 +24,5 @@ wwwroot/css/app.css
 *.received.*
 *.cer
 .output.txt
+.junie/plans
+*.db*
