@@ -8,15 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using NetWorthTracker.Common;
-using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Core.Features.MonthlyBalance;
 using NetWorthTracker.Data;
 using NetWorthTracker.Data.Api;
 using NetWorthTracker.Seeder;
-using NetWorthTracker.Services.Api.Features.Account;
 using NetWorthTracker.Services.Api.Features.MonthlyBalance;
 
-using ServiceRegistry = NetWorthTracker.Data.ServiceRegistry;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json", false);
@@ -31,9 +29,8 @@ LocalEnvFile.AddToConfiguration(builder.Configuration);
 builder.Services.Configure<AppPathOptions>(builder.Configuration.GetSection("AppPaths"));
 builder.Services.AddSingleton<IAppPaths, DefaultAppPaths>();
 
-// 2. Register Data and Services layers
-ServiceRegistry.ConfigureServices(builder.Services);
-NetWorthTracker.Services.ServiceRegistry.ConfigureServices(builder.Services);
+// 2. Register application modules and persistence adapters
+NetWorthTracker.Common.ServiceRegistry.ConfigureServices(builder.Services, builder.Configuration);
 
 // 3. Register any seeder-specific services if needed
 // builder.Services.AddTransient<DataSeeder>();

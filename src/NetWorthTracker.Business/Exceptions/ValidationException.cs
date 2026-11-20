@@ -1,4 +1,4 @@
-﻿namespace NetWorthTracker.Core.Exceptions;
+namespace NetWorthTracker.Core.Exceptions;
 
 public class ValidationException : Exception
 {

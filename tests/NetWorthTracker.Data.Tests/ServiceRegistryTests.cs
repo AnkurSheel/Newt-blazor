@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using NetWorthTracker.Business.Features.Accounts.Persistence;
 using NetWorthTracker.Data.Api;
-using NetWorthTracker.Data.Api.Features.Account;
 using NetWorthTracker.Data.Api.Features.MonthlyBalance;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.MonthlyBalance;
@@ -13,7 +13,7 @@ namespace NetWorthTracker.Data.Tests;
 public sealed class ServiceRegistryTests
 {
     [Fact]
-    public void ConfigureServices_RegistersAllDataServicesAndRepositories()
+    public void DataServiceRegistry_RegistersDataRepositories()
     {
         // Arrange
         var services = new ServiceCollection();

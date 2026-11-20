@@ -11,6 +11,7 @@ NetWorthTracker/
 ├── src/
 │   ├── NetWorthTracker.App/          # MAUI Blazor Hybrid Host Application (.NET 9 MAUI)
 │   ├── NetWorthTracker.UI/           # Blazor UI Components, Pages, and Styles (Tailwind CSS, Syncfusion)
+│   ├── NetWorthTracker.Business/     # Feature modules, public operations, models, and persistence ports
 │   ├── NetWorthTracker.Services/     # Business logic & application services
 │   ├── NetWorthTracker.Services.Api/ # Service abstractions and interfaces
 │   ├── NetWorthTracker.Data/         # EF Core DbContext, SQLite repositories & migrations
@@ -40,10 +41,11 @@ NetWorthTracker/
 ## 3. Project Structure & Responsibilities
 
 ### `NetWorthTracker.Models`
-Contains all core data models, DTOs (Data Transfer Objects), enums, and exceptions.
-- `Features/Account/`: Account models, `AccountCreateDTO`, `AccountResponseDTO`, etc.
+Contains remaining shared data models, DTOs (Data Transfer Objects), and enums.
 - `Features/MonthlyBalance/`: Monthly balance entries and DTOs.
-- `Exceptions/`: Domain-specific exceptions.
+
+### `NetWorthTracker.Business`
+Contains feature-oriented business modules and their public contracts and persistence ports. Accounts has migrated here; its public operations and contracts are in `Features/Accounts/Api`, implementation in `Features/Accounts/Internal`, and the repository port in `Features/Accounts/Persistence`. Shared business validation exceptions are also defined here. Monthly Balances and Financial Summary remain in the legacy layers until migrated.
 
 ### `NetWorthTracker.Data.Api` & `NetWorthTracker.Data`
 - `NetWorthTracker.Data.Api`: Data contract interfaces (e.g. repository abstractions).

@@ -1,4 +1,4 @@
-﻿namespace NetWorthTracker.Core.Features.Account;
+namespace NetWorthTracker.Business.Features.Accounts.Api;
 
 public record AccountResponseDTO
 {

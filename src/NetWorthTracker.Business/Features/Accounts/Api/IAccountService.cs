@@ -1,6 +1,4 @@
-﻿using NetWorthTracker.Core.Features.Account;
-
-namespace NetWorthTracker.Services.Api.Features.Account;
+namespace NetWorthTracker.Business.Features.Accounts.Api;
 
 public interface IAccountService
 {

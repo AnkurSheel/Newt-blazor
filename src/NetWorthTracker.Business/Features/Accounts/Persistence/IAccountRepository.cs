@@ -1,6 +1,6 @@
-﻿using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
 
-namespace NetWorthTracker.Data.Api.Features.Account;
+namespace NetWorthTracker.Business.Features.Accounts.Persistence;
 
 public interface IAccountRepository
 {

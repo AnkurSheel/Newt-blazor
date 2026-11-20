@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using NetWorthTracker.Data.Api.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Persistence;
 using NetWorthTracker.Data.Api.Features.MonthlyBalance;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.MonthlyBalance;

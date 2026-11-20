@@ -10,6 +10,9 @@
       "src\\NetWorthTracker.Services.Api\\NetWorthTracker.Services.Api.csproj",
       "src\\NetWorthTracker.Services\\NetWorthTracker.Services.csproj",
       "src\\NetWorthTracker.UI\\NetWorthTracker.UI.csproj",
+      "tests\\NetWorthTracker.Architecture.Tests\\NetWorthTracker.Architecture.Tests.csproj",
+      "tests\\NetWorthTracker.Business.Tests\\NetWorthTracker.Business.Tests.csproj",
+      "tests\\NetWorthTracker.Common.Tests\\NetWorthTracker.Common.Tests.csproj",
       "tests\\NetWorthTracker.Data.Tests\\NetWorthTracker.Data.Tests.csproj",
       "tests\\NetWorthTracker.UI.Tests\\NetWorthTracker.UI.Tests.csproj"
     ]

@@ -1,11 +1,10 @@
-﻿using NetWorthTracker.Core.Exceptions;
-using NetWorthTracker.Core.Features.Account;
-using NetWorthTracker.Data.Api.Features.Account;
-using NetWorthTracker.Services.Api.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.Accounts.Persistence;
+using NetWorthTracker.Core.Exceptions;
 
-namespace NetWorthTracker.Services.Features.Account;
+namespace NetWorthTracker.Business.Features.Accounts.Internal;
 
-public class AccountService : IAccountService
+internal sealed class AccountService : IAccountService
 {
     private readonly IAccountRepository _repository;
 
@@ -25,6 +24,7 @@ public class AccountService : IAccountService
         {
             throw new ValidationException("Category name is required.");
         }
+
         await _repository.AddAsync(account);
     }
 }
