@@ -49,9 +49,9 @@ jobs:
             C:\Program Files\dotnet\sdk-manifests
             C:\Program Files\dotnet\template-packs
             C:\Program Files\dotnet\metadata
-          key: ${{ runner.os }}-maui-workload-net9-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          key: ${{ runner.os }}-maui-workload-net10-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
           restore-keys: |
-            ${{ runner.os }}-maui-workload-net9-
+            ${{ runner.os }}-maui-workload-net10-
 
       - name: Install MAUI Workload
         if: steps.cache-maui-workload.outputs.cache-hit != 'true'
@@ -126,7 +126,7 @@ jobs:
         run: |
           $buildVer = "${{ inputs.version }}"
           dotnet publish src/NetWorthTracker.App/NetWorthTracker.App.csproj `
-            -f net9.0-windows10.0.19041.0 `
+            -f net10.0-windows10.0.19041.0 `
             -c Release `
             /p:WindowsPackageType=MSIX `
             /p:GenerateAppxPackageOnBuild=true `
@@ -139,7 +139,7 @@ jobs:
         shell: pwsh
         run: |
           $buildVer = "${{ inputs.version }}"
-          $packagesDir = "src/NetWorthTracker.App/bin/Release/net9.0-windows10.0.19041.0/win10-x64/AppPackages"
+          $packagesDir = "src/NetWorthTracker.App/bin/Release/net10.0-windows10.0.19041.0/win10-x64/AppPackages"
           $msix = Get-ChildItem -Path $packagesDir -Filter "*.msix" -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           
           if ($null -eq $msix) {

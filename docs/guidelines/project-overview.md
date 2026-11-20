@@ -19,7 +19,8 @@ NetWorthTracker/
 │   ├── NetWorthTracker.Common/       # Service registration & DI helper extensions
 │   └── NetWorthTracker.Seeder/       # Database seeder console application for CSV imports
 ├── tests/
-│   └── NetWorthTracker.UI.Tests/     # Unit & component tests using bUnit and xUnit
+│   ├── NetWorthTracker.UI.Tests/     # UI tests using bUnit and xUnit
+│   └── NetWorthTracker.Data.Tests/   # Data-layer tests
 └── docs/
     └── guidelines/                   # Shared developer and AI agent documentation
 ```
@@ -28,7 +29,7 @@ NetWorthTracker/
 
 ## 2. Technology Stack & Key Libraries
 
-- **Language & Runtime:** C# 13, .NET 9 (`net9.0`, `net9.0-windows10.0.19041.0`, `net9.0-maccatalyst`)
+- **Language & Runtime:** Latest C# version supported by the .NET 10 SDK; .NET 10 (`net10.0` and platform-specific app target frameworks)
 - **App Platform:** .NET MAUI Blazor Hybrid (`Microsoft.AspNetCore.Components.WebView.Maui`)
 - **UI Framework:** Blazor with code-behind pattern (`.razor` and `.razor.cs`), Tailwind CSS, Syncfusion Blazor Core
 - **Data & Persistence:** Entity Framework Core with SQLite (`networth.db`)
@@ -106,7 +107,7 @@ Contains all core data models, DTOs (Data Transfer Objects), enums, and exceptio
   ```
 - **Run Tests:**
   ```powershell
-  dotnet test tests\NetWorthTracker.UI.Tests\NetWorthTracker.UI.Tests.csproj
+  dotnet test NetWorthTracker.Tests.slnf --configuration Release --verbosity normal
   ```
 - **Run Seeder (Optional):**
   ```powershell
