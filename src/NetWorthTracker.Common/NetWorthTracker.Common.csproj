@@ -7,7 +7,7 @@
     </ItemGroup>
     
     <ItemGroup>
+        <ProjectReference Include="..\NetWorthTracker.Business\NetWorthTracker.Business.csproj" />
         <ProjectReference Include="..\NetWorthTracker.Data\NetWorthTracker.Data.csproj"/>
-        <ProjectReference Include="..\NetWorthTracker.Services\NetWorthTracker.Services.csproj" />
     </ItemGroup>
 </Project>

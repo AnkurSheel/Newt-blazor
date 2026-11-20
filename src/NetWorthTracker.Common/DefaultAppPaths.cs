@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using NetWorthTracker.Data.Api;
+using NetWorthTracker.Data;
 
 namespace NetWorthTracker.Common;
 

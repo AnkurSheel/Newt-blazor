@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using NetWorthTracker.Data.Api.Features.Account;
-using NetWorthTracker.Data.Api.Features.MonthlyBalance;
+using NetWorthTracker.Business.Features.Accounts.Persistence;
+using NetWorthTracker.Business.Features.FinancialSummary.Persistence;
+using NetWorthTracker.Business.Features.MonthlyBalances.Persistence;
 using NetWorthTracker.Data.Features.Account;
+using NetWorthTracker.Data.Features.FinancialSummary;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 
 namespace NetWorthTracker.Data;
@@ -15,5 +17,6 @@ public static class ServiceRegistry
         services.AddDbContext<AppDbContext>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IMonthlyBalanceRepository, MonthlyBalanceRepository>();
+        services.AddScoped<IFinancialSummaryRepository, FinancialSummaryRepository>();
     }
 }

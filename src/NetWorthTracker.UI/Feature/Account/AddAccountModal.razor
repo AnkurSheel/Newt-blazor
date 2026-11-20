@@ -1,5 +1,4 @@
-﻿@using NetWorthTracker.Core.Features.Account
-@using NetWorthTracker.Services.Api.Features.Account
+﻿@using NetWorthTracker.Business.Features.Accounts.Api
 @using Syncfusion.Blazor.Popups
 @inject IAccountService AccountService;
 
@@ -39,7 +38,12 @@
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account
                                 Name</label>
                             <SfTextBox @bind-Value="_newAccountName" Placeholder="e.g. Primary Checking"
+                                       @bind-Value:after="ClearAccountNameError"
                                        CssClass="e-dark-mode"/>
+                            @if (_accountNameError is not null)
+                            {
+                                <p role="alert" class="mt-1 text-sm text-rose-400">@_accountNameError</p>
+                            }
                         </div>
 
                         <MonthYearPicker Label="Open Date" @bind-Value="@_openDate"/>
@@ -68,7 +72,7 @@
                     <button @onclick="CloseModal"
                             class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition">Cancel
                     </button>
-                    <button @onclick="SaveAccount"
+                    <button @onclick="SaveAccount" disabled="@_isSaving"
                             class="px-5 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow transition">
                         Save Account
                     </button>

@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\NetWorthTracker.Models\NetWorthTracker.Models.csproj" />
-  </ItemGroup>
-
-</Project>

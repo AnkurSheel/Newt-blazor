@@ -1,14 +1,16 @@
 ﻿#region
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-using NetWorthTracker.Core.Features.Account;
-using NetWorthTracker.Data.Api.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.Accounts.Persistence;
 #endregion
 
 namespace NetWorthTracker.Data.Features.Account;
 
 public class AccountRepository : IAccountRepository
 {
+    private const int SqliteConstraintUnique = 2067;
     private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
     public AccountRepository(IDbContextFactory<AppDbContext> dbContextFactory)
@@ -41,6 +43,14 @@ public class AccountRepository : IAccountRepository
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         dbContext.Accounts.Add(new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate));
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqliteException
+                                          { SqliteExtendedErrorCode: SqliteConstraintUnique })
+        {
+            throw new DuplicateAccountException(ex);
+        }
     }
 }

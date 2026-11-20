@@ -1,0 +1,21 @@
+namespace NetWorthTracker.Business.Features.Accounts.Api;
+
+public record AccountResponseDTO
+{
+    public required int Id { get; init; }
+
+    public required string Name { get; init; } = string.Empty;
+
+    public AccountType Type { get; init; }
+
+    public DateOnly? ClosedDate { get; init; }
+
+    public DateOnly OpenDate { get; init; }
+
+    public decimal? BalanceOnDate { get; init; }
+
+    public bool IsClosedOn(DateOnly targetDate)
+    {
+        return ClosedDate.HasValue && ClosedDate.Value <= targetDate;
+    }
+}

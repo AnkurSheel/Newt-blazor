@@ -1,4 +1,4 @@
-﻿using NetWorthTracker.Data.Features.MonthlyBalance;
+using NetWorthTracker.Data.Features.FinancialSummary;
 using NetWorthTracker.Data.Tests.TestHelpers;
 
 namespace NetWorthTracker.Data.Tests.Features.MonthlyBalance;
@@ -7,11 +7,11 @@ namespace NetWorthTracker.Data.Tests.Features.MonthlyBalance;
 public sealed class MonthlyBalanceQuerySqlTests : IAsyncLifetime
 {
     private readonly SqliteTestDatabase _database = new();
-    private readonly MonthlyBalanceRepository _repository;
+    private readonly FinancialSummaryRepository _repository;
 
     public MonthlyBalanceQuerySqlTests()
     {
-        _repository = new MonthlyBalanceRepository(_database);
+        _repository = new FinancialSummaryRepository(_database);
     }
 
     public Task InitializeAsync()

@@ -1,7 +1,8 @@
-﻿using NetWorthTracker.Core.Features.Account;
-using NetWorthTracker.Core.Features.FinancialSummary;
-using NetWorthTracker.Core.Features.MonthlyBalance;
+﻿using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.MonthlyBalances.Api;
+using NetWorthTracker.Business.Features.FinancialSummary.Api;
 using NetWorthTracker.Data.Features.Account;
+using NetWorthTracker.Data.Features.FinancialSummary;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 using NetWorthTracker.Data.Tests.TestHelpers;
 
@@ -11,10 +12,12 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
 {
     private readonly SqliteTestDatabase _database = new();
     private readonly MonthlyBalanceRepository _repository;
+    private readonly FinancialSummaryRepository _financialSummaryRepository;
 
     public MonthlyBalanceRepositoryTests()
     {
         _repository = new MonthlyBalanceRepository(_database);
+        _financialSummaryRepository = new FinancialSummaryRepository(_database);
     }
 
     public Task InitializeAsync()
@@ -84,13 +87,34 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetBalanceByDateAsync_WhenQueryDateIsNotNormalized_ReturnsNull()
+    {
+        // Arrange
+        var storedMonth = new DateOnly(2026, 2, 1);
+        var queryDate = new DateOnly(2026, 2, 15);
+        await using var dbContext = await _database.CreateDbContextAsync();
+        var account = new AccountEntity("Savings", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
+        dbContext.Accounts.Add(account);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.MonthlyBalances.Add(new MonthlyBalanceEntity(account.Id, storedMonth, 3200m));
+        await dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _repository.GetBalanceByDateAsync(account.Id, queryDate);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
     public async Task GetMonthlySummaryAsync_WhenNoBalancesForDate_ReturnsDefaultSummary()
     {
         // Arrange
         var queryDate = new DateOnly(2026, 5, 1);
 
         // Act
-        var result = await _repository.GetMonthlySummaryAsync(queryDate);
+        var result = await _financialSummaryRepository.GetMonthlySummaryAsync(queryDate);
 
         // Assert
         Assert.Multiple(
@@ -120,7 +144,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetMonthlySummaryAsync(queryDate);
+        var result = await _financialSummaryRepository.GetMonthlySummaryAsync(queryDate);
 
         // Assert
         Assert.Multiple(
@@ -148,7 +172,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetMonthlySummaryAsync(queryDate);
+        var result = await _financialSummaryRepository.GetMonthlySummaryAsync(queryDate);
 
         // Assert
         Assert.Multiple(() => Assert.Equal(1000m, result.TotalAssets), () => Assert.Equal(0m, result.TotalLiabilities));
@@ -176,7 +200,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetMonthlySummaryAsync(queryDate);
+        var result = await _financialSummaryRepository.GetMonthlySummaryAsync(queryDate);
 
         // Assert
         Assert.Multiple(() => Assert.Equal(2000m, result.TotalAssets), () => Assert.Equal(0m, result.TotalLiabilities));
@@ -210,7 +234,8 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
 
         // Act
-        IReadOnlyList<MonthlySummaryDTO> result = await _repository.GetMonthlySummariesAsync(cutoffDate);
+        IReadOnlyList<MonthlySummaryDTO> result =
+            await _financialSummaryRepository.GetMonthlySummariesAsync(cutoffDate);
 
         // Assert
         Assert.Equal(3, result.Count);
@@ -224,6 +249,39 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
             () => Assert.Equal(new DateOnly(2026, 3, 1), result[2].SelectedDate),
             () => Assert.Equal(15000m, result[2].TotalAssets),
             () => Assert.Equal(1500m, result[2].TotalLiabilities));
+    }
+
+    [Fact]
+    public async Task GetMonthlySummariesAsync_ExcludesAccountsOutsideActiveDates()
+    {
+        // Arrange
+        var selectedDate = new DateOnly(2026, 3, 1);
+        await using var dbContext = await _database.CreateDbContextAsync();
+
+        var activeAccount = new AccountEntity("Active", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
+        var futureAccount = new AccountEntity("Future", AccountType.ASSET, new DateOnly(2026, 4, 1), null);
+        var closedAccount = new AccountEntity(
+            "Closed",
+            AccountType.LIABILITY,
+            new DateOnly(2025, 1, 1),
+            selectedDate);
+        dbContext.Accounts.AddRange(activeAccount, futureAccount, closedAccount);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.MonthlyBalances.AddRange(
+            new MonthlyBalanceEntity(activeAccount.Id, selectedDate, 2000m),
+            new MonthlyBalanceEntity(futureAccount.Id, selectedDate, 5000m),
+            new MonthlyBalanceEntity(closedAccount.Id, selectedDate, 8000m));
+        await dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _financialSummaryRepository.GetMonthlySummariesAsync(selectedDate);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Multiple(
+            () => Assert.Equal(2000m, result[0].TotalAssets),
+            () => Assert.Equal(0m, result[0].TotalLiabilities));
     }
 
     [Fact]
@@ -263,7 +321,8 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
 
         // Act
-        IReadOnlyList<MonthlySummaryDTO> result = await _repository.GetYearlySummariesAsync(cutoffDate);
+        IReadOnlyList<MonthlySummaryDTO> result =
+            await _financialSummaryRepository.GetYearlySummariesAsync(cutoffDate);
 
         // Assert
         Assert.Equal(3, result.Count);
@@ -277,5 +336,39 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
             () => Assert.Equal(new DateOnly(2026, 6, 1), result[2].SelectedDate),
             () => Assert.Equal(6000m, result[2].TotalAssets),
             () => Assert.Equal(100m, result[2].TotalLiabilities));
+    }
+
+    [Fact]
+    public async Task GetYearlySummariesAsync_ExcludesInactiveAccountsBeforeSelectingLatestMonth()
+    {
+        // Arrange
+        var selectedDate = new DateOnly(2026, 3, 1);
+        await using var dbContext = await _database.CreateDbContextAsync();
+
+        var activeAccount = new AccountEntity("Active", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
+        var futureAccount = new AccountEntity("Future", AccountType.ASSET, new DateOnly(2026, 4, 1), null);
+        var closedAccount = new AccountEntity(
+            "Closed",
+            AccountType.ASSET,
+            new DateOnly(2025, 1, 1),
+            selectedDate);
+        dbContext.Accounts.AddRange(activeAccount, futureAccount, closedAccount);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.MonthlyBalances.AddRange(
+            new MonthlyBalanceEntity(activeAccount.Id, new DateOnly(2026, 2, 1), 2000m),
+            new MonthlyBalanceEntity(futureAccount.Id, new DateOnly(2026, 2, 1), 5000m),
+            new MonthlyBalanceEntity(closedAccount.Id, selectedDate, 8000m));
+        await dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _financialSummaryRepository.GetYearlySummariesAsync(selectedDate);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Multiple(
+            () => Assert.Equal(new DateOnly(2026, 2, 1), result[0].SelectedDate),
+            () => Assert.Equal(2000m, result[0].TotalAssets),
+            () => Assert.Equal(0m, result[0].TotalLiabilities));
     }
 }

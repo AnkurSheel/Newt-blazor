@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
 
 namespace NetWorthTracker.UI.Feature.Account;
 
@@ -21,9 +21,16 @@ public partial class AddAccountModal
     private bool _isAccountClosed;
     private DateOnly? _closedDate;
     private DateOnly? _openDate = DateOnly.FromDateTime(DateTime.Now);
+    private string? _accountNameError;
+    private bool _isSaving;
 
     private async Task OnVisibleChanged(bool value)
     {
+        if (!value)
+        {
+            ClearAccountNameError();
+        }
+
         IsVisible = value;
         await IsVisibleChanged.InvokeAsync(value);
     }
@@ -45,14 +52,46 @@ public partial class AddAccountModal
 
     private async Task SaveAccount()
     {
-        if (_openDate != null)
+        if (_isSaving)
         {
-            await AccountService.AddAccountAsync(
-                new AccountCreateDTO(_newAccountName, _newAccountType, _openDate.Value, _closedDate));
+            return;
         }
 
-        await OnAccountSaved.InvokeAsync();
-        await CloseModal();
+        _isSaving = true;
+        ClearAccountNameError();
+        var submittedName = _newAccountName;
+        try
+        {
+            if (_openDate is not null)
+            {
+                try
+                {
+                    await AccountService.AddAccountAsync(
+                        new AccountCreateDTO(submittedName, _newAccountType, _openDate.Value, _closedDate));
+                }
+                catch (DuplicateAccountException ex)
+                {
+                    if (IsVisible && _newAccountName == submittedName)
+                    {
+                        _accountNameError = ex.Message;
+                    }
+
+                    return;
+                }
+            }
+
+            await OnAccountSaved.InvokeAsync();
+            await CloseModal();
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ClearAccountNameError()
+    {
+        _accountNameError = null;
     }
 
     private void ResetForm()

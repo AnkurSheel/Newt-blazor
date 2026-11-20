@@ -1,4 +1,6 @@
-﻿using NetWorthTracker.Core.Features.Account;
+﻿using Microsoft.EntityFrameworkCore;
+
+using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 using NetWorthTracker.Data.Tests.TestHelpers;
@@ -163,5 +165,49 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
             () => Assert.Equal(AccountType.ASSET, savedAccount.Type),
             () => Assert.Equal(new DateOnly(2025, 5, 1), savedAccount.OpenDate),
             () => Assert.Null(savedAccount.ClosedDate));
+    }
+
+    [Fact]
+    public async Task AddAsync_WhenNameMatchesClosedAccount_RejectsDuplicateEvenWithDifferentType()
+    {
+        // Arrange
+        var openDate = new DateOnly(2025, 1, 1);
+        var closedDate = new DateOnly(2025, 2, 1);
+        await _repository.AddAsync(new AccountCreateDTO("Checking", AccountType.ASSET, openDate, closedDate));
+        var duplicate = new AccountCreateDTO("Checking", AccountType.LIABILITY, closedDate, null);
+
+        // Act
+        await Assert.ThrowsAsync<DuplicateAccountException>(() => _repository.AddAsync(duplicate));
+
+        // Assert
+        var savedAccount = Assert.Single(await _repository.GetAllAsync(closedDate));
+        Assert.Equal(AccountType.ASSET, savedAccount.Type);
+    }
+
+    [Fact]
+    public async Task AddAsync_WhenNameDiffersInCase_PreservesExistingNameComparison()
+    {
+        // Arrange
+        var openDate = new DateOnly(2025, 1, 1);
+        await _repository.AddAsync(new AccountCreateDTO("Checking", AccountType.ASSET, openDate, null));
+        var distinct = new AccountCreateDTO("checking", AccountType.ASSET, openDate, null);
+
+        // Act
+        await _repository.AddAsync(distinct);
+
+        // Assert
+        var names = (await _repository.GetAllAsync(openDate)).Select(account => account.Name);
+        Assert.Equal(["Checking", "checking"], names);
+    }
+
+    [Fact]
+    public async Task AddAsync_WhenDatesViolateCheckConstraint_DoesNotReportDuplicate()
+    {
+        // Arrange
+        var openDate = new DateOnly(2025, 1, 1);
+        var invalid = new AccountCreateDTO("Checking", AccountType.ASSET, openDate, openDate);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<DbUpdateException>(() => _repository.AddAsync(invalid));
     }
 }
