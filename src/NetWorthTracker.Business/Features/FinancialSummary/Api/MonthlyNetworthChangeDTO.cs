@@ -1,4 +1,4 @@
-﻿namespace NetWorthTracker.Core.Features.FinancialSummary;
+namespace NetWorthTracker.Business.Features.FinancialSummary.Api;
 
 public record MonthlyNetworthChangeDTO(
     DateOnly SelectedDate,

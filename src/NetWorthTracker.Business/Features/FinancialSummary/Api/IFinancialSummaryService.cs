@@ -1,6 +1,4 @@
-﻿using NetWorthTracker.Core.Features.FinancialSummary;
-
-namespace NetWorthTracker.Services.Api.Features.FinancialSummary;
+namespace NetWorthTracker.Business.Features.FinancialSummary.Api;
 
 public interface IFinancialSummaryService
 {

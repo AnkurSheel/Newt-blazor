@@ -1,12 +1,3 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup>
-      <ProjectReference Include="..\NetWorthTracker.Business\NetWorthTracker.Business.csproj" />
-      <ProjectReference Include="..\NetWorthTracker.Services.Api\NetWorthTracker.Services.Api.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14"/>
-    </ItemGroup>
-
 </Project>

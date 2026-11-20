@@ -21,8 +21,7 @@ public sealed class ModuleBoundaryTests
             ["NetWorthTracker.Common"] =
             [
                 "NetWorthTracker.Business",
-                "NetWorthTracker.Data",
-                "NetWorthTracker.Services"
+                "NetWorthTracker.Data"
             ],
             ["NetWorthTracker.Data"] = ["NetWorthTracker.Business", "NetWorthTracker.Data.Api"],
             ["NetWorthTracker.Data.Api"] = ["NetWorthTracker.Models"],
@@ -33,18 +32,9 @@ public sealed class ModuleBoundaryTests
                 "NetWorthTracker.Common",
                 "NetWorthTracker.Data"
             ],
-            ["NetWorthTracker.Services"] =
-            [
-                "NetWorthTracker.Business",
-                "NetWorthTracker.Services.Api"
-            ],
-            ["NetWorthTracker.Services.Api"] = ["NetWorthTracker.Models"],
-            ["NetWorthTracker.UI"] =
-            [
-                "NetWorthTracker.Business",
-                "NetWorthTracker.Models",
-                "NetWorthTracker.Services.Api"
-            ],
+            ["NetWorthTracker.Services"] = [],
+            ["NetWorthTracker.Services.Api"] = [],
+            ["NetWorthTracker.UI"] = ["NetWorthTracker.Business"],
             ["NetWorthTracker.App"] = ["NetWorthTracker.Common", "NetWorthTracker.UI"]
         };
 

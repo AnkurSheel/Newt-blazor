@@ -9,7 +9,6 @@ public static class ServiceRegistry
     {
         services.Configure<AppPathOptions>(configuration.GetSection("AppPaths"));
         Data.ServiceRegistry.ConfigureServices(services);
-        Services.ServiceRegistry.ConfigureServices(services);
         NetWorthTracker.Business.ServiceRegistry.ConfigureServices(services);
 
     }

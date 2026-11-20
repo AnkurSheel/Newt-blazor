@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
 using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.FinancialSummary.Api;
 using NetWorthTracker.Business.Features.FinancialSummary.Persistence;
-using NetWorthTracker.Core.Features.FinancialSummary;
 
 namespace NetWorthTracker.Data.Features.FinancialSummary;
 

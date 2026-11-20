@@ -1,6 +1,6 @@
 ﻿using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Business.Features.MonthlyBalances.Api;
-using NetWorthTracker.Core.Features.FinancialSummary;
+using NetWorthTracker.Business.Features.FinancialSummary.Api;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.FinancialSummary;
 using NetWorthTracker.Data.Features.MonthlyBalance;

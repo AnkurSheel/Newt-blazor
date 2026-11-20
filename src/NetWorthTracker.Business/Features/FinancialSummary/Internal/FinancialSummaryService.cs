@@ -1,10 +1,9 @@
-﻿using NetWorthTracker.Core.Features.FinancialSummary;
+using NetWorthTracker.Business.Features.FinancialSummary.Api;
 using NetWorthTracker.Business.Features.FinancialSummary.Persistence;
-using NetWorthTracker.Services.Api.Features.FinancialSummary;
 
-namespace NetWorthTracker.Services.Features.FinancialSummary;
+namespace NetWorthTracker.Business.Features.FinancialSummary.Internal;
 
-public class FinancialSummaryService : IFinancialSummaryService
+internal sealed class FinancialSummaryService : IFinancialSummaryService
 {
     private readonly IFinancialSummaryRepository _financialSummaryRepository;
 
@@ -113,8 +112,8 @@ public class FinancialSummaryService : IFinancialSummaryService
         {
             return 0;
         }
-        var actualChange = currentValue - previous;
 
+        var actualChange = currentValue - previous;
         return (float)(actualChange / previous);
     }
 }
