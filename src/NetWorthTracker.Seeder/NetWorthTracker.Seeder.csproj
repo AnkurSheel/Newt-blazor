@@ -8,7 +8,6 @@
         <ProjectReference Include="..\NetWorthTracker.Common\NetWorthTracker.Common.csproj" />
         <ProjectReference Include="..\NetWorthTracker.Business\NetWorthTracker.Business.csproj" />
         <ProjectReference Include="..\NetWorthTracker.Data\NetWorthTracker.Data.csproj" />
-        <ProjectReference Include="..\NetWorthTracker.Services.Api\NetWorthTracker.Services.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

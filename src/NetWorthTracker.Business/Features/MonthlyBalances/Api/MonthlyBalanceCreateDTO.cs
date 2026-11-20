@@ -1,4 +1,4 @@
-﻿namespace NetWorthTracker.Core.Features.MonthlyBalance;
+namespace NetWorthTracker.Business.Features.MonthlyBalances.Api;
 
 public class MonthlyBalanceCreateDTO
 {

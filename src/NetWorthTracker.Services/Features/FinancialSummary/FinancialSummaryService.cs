@@ -1,30 +1,30 @@
 ﻿using NetWorthTracker.Core.Features.FinancialSummary;
-using NetWorthTracker.Data.Api.Features.MonthlyBalance;
+using NetWorthTracker.Business.Features.FinancialSummary.Persistence;
 using NetWorthTracker.Services.Api.Features.FinancialSummary;
 
 namespace NetWorthTracker.Services.Features.FinancialSummary;
 
 public class FinancialSummaryService : IFinancialSummaryService
 {
-    private readonly IMonthlyBalanceRepository _monthlyBalanceRepository;
+    private readonly IFinancialSummaryRepository _financialSummaryRepository;
 
-    public FinancialSummaryService(IMonthlyBalanceRepository monthlyBalanceRepository)
+    public FinancialSummaryService(IFinancialSummaryRepository financialSummaryRepository)
     {
-        _monthlyBalanceRepository = monthlyBalanceRepository;
+        _financialSummaryRepository = financialSummaryRepository;
     }
 
     public async Task<MonthlySummaryDTO> GetMonthlySummary(DateOnly selectedDate)
     {
-        return await _monthlyBalanceRepository.GetMonthlySummaryAsync(selectedDate);
+        return await _financialSummaryRepository.GetMonthlySummaryAsync(selectedDate);
     }
 
     public async Task<MonthlyNetworthChangeDTO> GetMonthlyNetworthChangeAsync(DateOnly selectedDate)
     {
         var previousMonthDate = selectedDate.AddMonths(-1);
         Task<MonthlySummaryDTO> currentMonthlySummaryAsyncTask =
-            _monthlyBalanceRepository.GetMonthlySummaryAsync(selectedDate);
+            _financialSummaryRepository.GetMonthlySummaryAsync(selectedDate);
         Task<MonthlySummaryDTO> previousMonthlySummaryAsyncTask =
-            _monthlyBalanceRepository.GetMonthlySummaryAsync(previousMonthDate);
+            _financialSummaryRepository.GetMonthlySummaryAsync(previousMonthDate);
 
         await Task.WhenAll(currentMonthlySummaryAsyncTask, previousMonthlySummaryAsyncTask);
 
@@ -44,7 +44,7 @@ public class FinancialSummaryService : IFinancialSummaryService
     public async Task<IReadOnlyList<TrendDTO>> GetMonthlyTrendsAsync(DateOnly selectedDate)
     {
         IReadOnlyList<MonthlySummaryDTO> monthlySummaries =
-            await _monthlyBalanceRepository.GetMonthlySummariesAsync(selectedDate);
+            await _financialSummaryRepository.GetMonthlySummariesAsync(selectedDate);
 
         if (monthlySummaries.Count == 0)
         {
@@ -72,7 +72,7 @@ public class FinancialSummaryService : IFinancialSummaryService
     public async Task<IReadOnlyList<TrendDTO>> GetYearlyTrendsAsync(DateOnly selectedDate)
     {
         IReadOnlyList<MonthlySummaryDTO> yearlySummaries =
-            await _monthlyBalanceRepository.GetYearlySummariesAsync(selectedDate);
+            await _financialSummaryRepository.GetYearlySummariesAsync(selectedDate);
 
         if (yearlySummaries.Count == 0)
         {

@@ -17,7 +17,7 @@ public sealed class ModuleBoundaryTests
     private static readonly IReadOnlyDictionary<string, string[]> AllowedProjectReferences =
         new Dictionary<string, string[]>
         {
-            ["NetWorthTracker.Business"] = [],
+            ["NetWorthTracker.Business"] = ["NetWorthTracker.Models"],
             ["NetWorthTracker.Common"] =
             [
                 "NetWorthTracker.Business",
@@ -31,12 +31,11 @@ public sealed class ModuleBoundaryTests
             [
                 "NetWorthTracker.Business",
                 "NetWorthTracker.Common",
-                "NetWorthTracker.Data",
-                "NetWorthTracker.Services.Api"
+                "NetWorthTracker.Data"
             ],
             ["NetWorthTracker.Services"] =
             [
-                "NetWorthTracker.Data.Api",
+                "NetWorthTracker.Business",
                 "NetWorthTracker.Services.Api"
             ],
             ["NetWorthTracker.Services.Api"] = ["NetWorthTracker.Models"],

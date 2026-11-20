@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using NetWorthTracker.Services.Api.Features.FinancialSummary;
-using NetWorthTracker.Services.Api.Features.MonthlyBalance;
 using NetWorthTracker.Services.Features.FinancialSummary;
-using NetWorthTracker.Services.Features.MonthlyBalance;
 
 namespace NetWorthTracker.Services;
 
@@ -11,7 +9,6 @@ public static class ServiceRegistry
 {
     public static void ConfigureServices(IServiceCollection services)
     {
-        services.AddScoped<IMonthlyBalanceService, MonthlyBalanceService>();
         services.AddScoped<IFinancialSummaryService, FinancialSummaryService>();
     }
 }

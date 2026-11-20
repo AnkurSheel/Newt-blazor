@@ -2,9 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using NetWorthTracker.Business.Features.Accounts.Persistence;
+using NetWorthTracker.Business.Features.FinancialSummary.Persistence;
+using NetWorthTracker.Business.Features.MonthlyBalances.Persistence;
 using NetWorthTracker.Data.Api;
-using NetWorthTracker.Data.Api.Features.MonthlyBalance;
 using NetWorthTracker.Data.Features.Account;
+using NetWorthTracker.Data.Features.FinancialSummary;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 using NetWorthTracker.Data.Tests.TestHelpers;
 
@@ -30,6 +32,7 @@ public sealed class ServiceRegistryTests
         var dbContext = scope.ServiceProvider.GetService<AppDbContext>();
         var accountRepository = scope.ServiceProvider.GetService<IAccountRepository>();
         var monthlyBalanceRepository = scope.ServiceProvider.GetService<IMonthlyBalanceRepository>();
+        var financialSummaryRepository = scope.ServiceProvider.GetService<IFinancialSummaryRepository>();
 
         Assert.Multiple(
             () => Assert.NotNull(dbContextFactory),
@@ -37,6 +40,8 @@ public sealed class ServiceRegistryTests
             () => Assert.NotNull(accountRepository),
             () => Assert.IsType<AccountRepository>(accountRepository),
             () => Assert.NotNull(monthlyBalanceRepository),
-            () => Assert.IsType<MonthlyBalanceRepository>(monthlyBalanceRepository));
+            () => Assert.IsType<MonthlyBalanceRepository>(monthlyBalanceRepository),
+            () => Assert.NotNull(financialSummaryRepository),
+            () => Assert.IsType<FinancialSummaryRepository>(financialSummaryRepository));
     }
 }

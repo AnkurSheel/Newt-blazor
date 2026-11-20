@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <ProjectReference Include="..\NetWorthTracker.Data.Api\NetWorthTracker.Data.Api.csproj" />
+      <ProjectReference Include="..\NetWorthTracker.Business\NetWorthTracker.Business.csproj" />
       <ProjectReference Include="..\NetWorthTracker.Services.Api\NetWorthTracker.Services.Api.csproj" />
     </ItemGroup>
 

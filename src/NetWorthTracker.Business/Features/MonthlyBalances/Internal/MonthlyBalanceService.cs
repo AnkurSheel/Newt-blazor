@@ -1,10 +1,9 @@
-﻿using NetWorthTracker.Core.Features.MonthlyBalance;
-using NetWorthTracker.Data.Api.Features.MonthlyBalance;
-using NetWorthTracker.Services.Api.Features.MonthlyBalance;
+using NetWorthTracker.Business.Features.MonthlyBalances.Api;
+using NetWorthTracker.Business.Features.MonthlyBalances.Persistence;
 
-namespace NetWorthTracker.Services.Features.MonthlyBalance;
+namespace NetWorthTracker.Business.Features.MonthlyBalances.Internal;
 
-public class MonthlyBalanceService : IMonthlyBalanceService
+internal sealed class MonthlyBalanceService : IMonthlyBalanceService
 {
     private readonly IMonthlyBalanceRepository _repository;
 

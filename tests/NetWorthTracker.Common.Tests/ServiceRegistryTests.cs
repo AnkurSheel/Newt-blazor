@@ -2,15 +2,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.Common;
 using NetWorthTracker.Data.Api;
+using NetWorthTracker.Services.Api.Features.FinancialSummary;
 
 namespace NetWorthTracker.Common.Tests;
 
 public sealed class ServiceRegistryTests
 {
     [Fact]
-    public void CommonServiceRegistry_ResolvesAccountService()
+    public void CommonServiceRegistry_ResolvesBusinessServices()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -21,8 +23,13 @@ public sealed class ServiceRegistryTests
         ServiceRegistry.ConfigureServices(services, configuration);
         using var provider = services.BuildServiceProvider();
         var accountService = provider.GetService<IAccountService>();
+        var monthlyBalanceService = provider.GetService<IMonthlyBalanceService>();
+        var financialSummaryService = provider.GetService<IFinancialSummaryService>();
 
         // Assert
-        Assert.NotNull(accountService);
+        Assert.Multiple(
+            () => Assert.NotNull(accountService),
+            () => Assert.NotNull(monthlyBalanceService),
+            () => Assert.NotNull(financialSummaryService));
     }
 }

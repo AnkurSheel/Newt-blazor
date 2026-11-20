@@ -9,11 +9,10 @@ using Microsoft.Extensions.Hosting;
 
 using NetWorthTracker.Common;
 using NetWorthTracker.Business.Features.Accounts.Api;
-using NetWorthTracker.Core.Features.MonthlyBalance;
+using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.Data;
 using NetWorthTracker.Data.Api;
 using NetWorthTracker.Seeder;
-using NetWorthTracker.Services.Api.Features.MonthlyBalance;
 
 var builder = Host.CreateApplicationBuilder(args);
 

@@ -42,18 +42,18 @@ NetWorthTracker/
 
 ### `NetWorthTracker.Models`
 Contains remaining shared data models, DTOs (Data Transfer Objects), and enums.
-- `Features/MonthlyBalance/`: Monthly balance entries and DTOs.
+- Financial Summary DTOs remain here until that feature migrates.
 
 ### `NetWorthTracker.Business`
-Contains feature-oriented business modules and their public contracts and persistence ports. Accounts has migrated here; its public operations and contracts are in `Features/Accounts/Api`, implementation in `Features/Accounts/Internal`, and the repository port in `Features/Accounts/Persistence`. Shared business validation exceptions are also defined here. Monthly Balances and Financial Summary remain in the legacy layers until migrated.
+Contains feature-oriented business modules and their public contracts and persistence ports. Accounts and Monthly Balances have migrated here; each feature's API, internal operation, and persistence port live under `Features/{Accounts,MonthlyBalances}/{Api,Internal,Persistence}`. Shared business validation exceptions are also defined here. Financial Summary's read-only persistence port is under `Features/FinancialSummary/Persistence`; its service and output DTOs remain transitional in the legacy layers.
 
 ### `NetWorthTracker.Data.Api` & `NetWorthTracker.Data`
-- `NetWorthTracker.Data.Api`: Data contract interfaces (e.g. repository abstractions).
-- `NetWorthTracker.Data`: `AppDbContext`, EF Core migrations, SQLite database connection management, and repository implementations.
+- `NetWorthTracker.Data.Api`: Remaining legacy data contracts.
+- `NetWorthTracker.Data`: `AppDbContext`, EF Core migrations, SQLite database connection management, and adapters for the Business-owned persistence ports.
 
 ### `NetWorthTracker.Services.Api` & `NetWorthTracker.Services`
-- `NetWorthTracker.Services.Api`: Service layer contracts (e.g. `IAccountService`, `IMonthlyBalanceService`).
-- `NetWorthTracker.Services`: Service implementations containing domain validation and business rules.
+- `NetWorthTracker.Services.Api`: Remaining legacy service contracts, including Financial Summary.
+- `NetWorthTracker.Services`: Transitional service implementations; migrated features expose operations from Business instead.
 
 ### `NetWorthTracker.Common`
 - Aggregates dependency injection setups (e.g. `AddNetWorthTrackerServices()`) linking data access and business services for consumption by the UI host or seeders.
@@ -92,8 +92,8 @@ Contains feature-oriented business modules and their public contracts and persis
    - Keep UI components responsive and styled according to project Tailwind utilities.
 
 3. **Data & Service Access:**
-   - Always inject interfaces (`IAccountService`, `IMonthlyBalanceService`), never concrete classes.
-   - Keep business logic inside `Services`, leaving UI components focused purely on presentation and user interaction.
+   - Inject feature public-operation interfaces, never concrete classes. Accounts and Monthly Balances APIs are in Business.
+   - Keep business logic in the owning feature module; legacy Services remain only for features not yet migrated.
    - Use asynchronous programming (`async`/`await`) for all I/O and database operations.
 
 4. **Testing Standards:**
