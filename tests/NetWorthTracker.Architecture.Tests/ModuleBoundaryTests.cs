@@ -17,26 +17,66 @@ public sealed class ModuleBoundaryTests
     private static readonly IReadOnlyDictionary<string, string[]> AllowedProjectReferences =
         new Dictionary<string, string[]>
         {
-            ["NetWorthTracker.Business"] = ["NetWorthTracker.Models"],
+            ["NetWorthTracker.Business"] = [],
             ["NetWorthTracker.Common"] =
             [
                 "NetWorthTracker.Business",
                 "NetWorthTracker.Data"
             ],
             ["NetWorthTracker.Data"] = ["NetWorthTracker.Business", "NetWorthTracker.Data.Api"],
-            ["NetWorthTracker.Data.Api"] = ["NetWorthTracker.Models"],
-            ["NetWorthTracker.Models"] = [],
+            ["NetWorthTracker.Data.Api"] = [],
             ["NetWorthTracker.Seeder"] =
             [
                 "NetWorthTracker.Business",
                 "NetWorthTracker.Common",
                 "NetWorthTracker.Data"
             ],
-            ["NetWorthTracker.Services"] = [],
-            ["NetWorthTracker.Services.Api"] = [],
             ["NetWorthTracker.UI"] = ["NetWorthTracker.Business"],
             ["NetWorthTracker.App"] = ["NetWorthTracker.Common", "NetWorthTracker.UI"]
         };
+
+    [Fact]
+    public void RetiredLegacyProjects_AreAbsentFromRegistrationsAndReferences()
+    {
+        // Arrange
+        var repositoryRoot = FindRepositoryRoot();
+        var retiredProjects = new[]
+        {
+            "NetWorthTracker.Models",
+            "NetWorthTracker.Services",
+            "NetWorthTracker.Services.Api"
+        };
+        var solutionRegistrations =
+            File.ReadAllText(Path.Combine(repositoryRoot, "NetWorthTracker.sln"))
+            + File.ReadAllText(Path.Combine(repositoryRoot, "NetWorthTracker.Tests.slnf"));
+        var projectReferences = Directory.EnumerateFiles(
+                Path.Combine(repositoryRoot, "src"),
+                "*.csproj",
+                SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(
+                Path.Combine(repositoryRoot, "tests"),
+                "*.csproj",
+                SearchOption.AllDirectories))
+            .SelectMany(projectFile => System.Xml.Linq.XDocument.Load(projectFile)
+                .Descendants()
+                .Where(element => element.Name.LocalName == "ProjectReference")
+                .Select(element => Path.GetFileNameWithoutExtension(
+                    ((string?)element.Attribute("Include") ?? string.Empty)
+                    .Replace('\\', Path.DirectorySeparatorChar))))
+            .ToHashSet(StringComparer.Ordinal);
+
+        // Act
+        var registeredProjects = retiredProjects
+            .Where(project => solutionRegistrations.Contains(project, StringComparison.Ordinal))
+            .ToArray();
+        var referencedProjects = retiredProjects
+            .Where(projectReferences.Contains)
+            .ToArray();
+
+        // Assert
+        Assert.Empty(registeredProjects);
+        Assert.Empty(referencedProjects);
+    }
 
     [Fact]
     public void ProjectReferences_FollowThePermittedDependencyGraph()

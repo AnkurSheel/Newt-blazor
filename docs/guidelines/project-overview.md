@@ -2,26 +2,26 @@
 
 ## 1. Overview & Architecture
 
-**NetWorthTracker** is a personal finance management application built on .NET 9 using .NET MAUI with Blazor Hybrid. It allows users to track financial accounts, historical monthly balances, net worth trends, asset/liability breakdowns, and perform financial projections.
+**NetWorthTracker** is a personal finance management application built on .NET 10 using .NET MAUI with Blazor Hybrid. It allows users to track financial accounts, historical monthly balances, net worth trends, asset/liability breakdowns, and perform financial projections.
 
 The solution follows clean architecture principles with distinct separation of concerns across projects:
 
 ```
 NetWorthTracker/
 ├── src/
-│   ├── NetWorthTracker.App/          # MAUI Blazor Hybrid Host Application (.NET 9 MAUI)
+│   ├── NetWorthTracker.App/          # MAUI Blazor Hybrid Host Application (.NET 10 MAUI)
 │   ├── NetWorthTracker.UI/           # Blazor UI Components, Pages, and Styles (Tailwind CSS, Syncfusion)
 │   ├── NetWorthTracker.Business/     # Feature modules, public operations, models, and persistence ports
-│   ├── NetWorthTracker.Services/     # Business logic & application services
-│   ├── NetWorthTracker.Services.Api/ # Service abstractions and interfaces
 │   ├── NetWorthTracker.Data/         # EF Core DbContext, SQLite repositories & migrations
-│   ├── NetWorthTracker.Data.Api/     # Data access interfaces
-│   ├── NetWorthTracker.Models/       # Domain entities, DTOs, Enums, and custom exceptions
+│   ├── NetWorthTracker.Data.Api/     # Shared data infrastructure contracts
 │   ├── NetWorthTracker.Common/       # Service registration & DI helper extensions
 │   └── NetWorthTracker.Seeder/       # Database seeder console application for CSV imports
 ├── tests/
-│   ├── NetWorthTracker.UI.Tests/     # UI tests using bUnit and xUnit
-│   └── NetWorthTracker.Data.Tests/   # Data-layer tests
+│   ├── NetWorthTracker.Architecture.Tests/ # Project and module boundary tests
+│   ├── NetWorthTracker.Business.Tests/     # Business module tests
+│   ├── NetWorthTracker.Common.Tests/       # Composition tests
+│   ├── NetWorthTracker.Data.Tests/         # Data-layer tests
+│   └── NetWorthTracker.UI.Tests/           # UI tests using bUnit and xUnit
 └── docs/
     └── guidelines/                   # Shared developer and AI agent documentation
 ```
@@ -40,20 +40,12 @@ NetWorthTracker/
 
 ## 3. Project Structure & Responsibilities
 
-### `NetWorthTracker.Models`
-Contains remaining shared data models, DTOs (Data Transfer Objects), and enums.
-- Financial Summary DTOs remain here until that feature migrates.
-
 ### `NetWorthTracker.Business`
-Contains feature-oriented business modules and their public contracts and persistence ports. Accounts and Monthly Balances have migrated here; each feature's API, internal operation, and persistence port live under `Features/{Accounts,MonthlyBalances}/{Api,Internal,Persistence}`. Shared business validation exceptions are also defined here. Financial Summary's read-only persistence port is under `Features/FinancialSummary/Persistence`; its service and output DTOs remain transitional in the legacy layers.
+Contains the Accounts, Monthly Balances, and Financial Summary feature modules. Each module owns its public API and business operations; persistence ports live under `Features/{Accounts,MonthlyBalances,FinancialSummary}/Persistence`. Business-owned contracts, result types, and validation exceptions live in this project.
 
 ### `NetWorthTracker.Data.Api` & `NetWorthTracker.Data`
-- `NetWorthTracker.Data.Api`: Remaining legacy data contracts.
+- `NetWorthTracker.Data.Api`: Shared data infrastructure contracts, including application path access.
 - `NetWorthTracker.Data`: `AppDbContext`, EF Core migrations, SQLite database connection management, and adapters for the Business-owned persistence ports.
-
-### `NetWorthTracker.Services.Api` & `NetWorthTracker.Services`
-- `NetWorthTracker.Services.Api`: Remaining legacy service contracts, including Financial Summary.
-- `NetWorthTracker.Services`: Transitional service implementations; migrated features expose operations from Business instead.
 
 ### `NetWorthTracker.Common`
 - Aggregates dependency injection setups (e.g. `AddNetWorthTrackerServices()`) linking data access and business services for consumption by the UI host or seeders.
@@ -73,8 +65,12 @@ Contains feature-oriented business modules and their public contracts and persis
 ### `NetWorthTracker.Seeder`
 - Console utility used to seed initial account and transaction balance data from CSV files (`accounts.csv`, `monthly_balances.csv`) into SQLite.
 
-### `tests/NetWorthTracker.UI.Tests`
-- Component and unit tests for Blazor UI components using `bUnit` and `xUnit`.
+### Test projects
+- `tests/NetWorthTracker.Architecture.Tests`: Enforces the permitted project graph and Business module boundaries.
+- `tests/NetWorthTracker.Business.Tests`: Tests business module operations and calculations.
+- `tests/NetWorthTracker.Common.Tests`: Verifies service composition and dependency injection.
+- `tests/NetWorthTracker.Data.Tests`: Tests EF Core adapters and SQLite persistence behavior.
+- `tests/NetWorthTracker.UI.Tests`: Tests Blazor UI components using `bUnit` and `xUnit`.
 
 ---
 
@@ -92,8 +88,8 @@ Contains feature-oriented business modules and their public contracts and persis
    - Keep UI components responsive and styled according to project Tailwind utilities.
 
 3. **Data & Service Access:**
-   - Inject feature public-operation interfaces, never concrete classes. Accounts and Monthly Balances APIs are in Business.
-   - Keep business logic in the owning feature module; legacy Services remain only for features not yet migrated.
+   - Inject feature public-operation interfaces, never concrete classes. All feature APIs and business logic are in Business.
+   - Keep business logic in the owning feature module; Data implements its persistence ports.
    - Use asynchronous programming (`async`/`await`) for all I/O and database operations.
 
 4. **Testing Standards:**
