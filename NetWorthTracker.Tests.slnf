@@ -3,7 +3,6 @@
     "path": "NetWorthTracker.sln",
     "projects": [
       "src\\NetWorthTracker.Common\\NetWorthTracker.Common.csproj",
-      "src\\NetWorthTracker.Data.Api\\NetWorthTracker.Data.Api.csproj",
       "src\\NetWorthTracker.Data\\NetWorthTracker.Data.csproj",
       "src\\NetWorthTracker.Seeder\\NetWorthTracker.Seeder.csproj",
       "src\\NetWorthTracker.UI\\NetWorthTracker.UI.csproj",

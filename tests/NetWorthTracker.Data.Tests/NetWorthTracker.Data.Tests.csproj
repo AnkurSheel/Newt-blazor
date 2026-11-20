@@ -23,7 +23,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\NetWorthTracker.Business\NetWorthTracker.Business.csproj"/>
         <ProjectReference Include="..\..\src\NetWorthTracker.Data\NetWorthTracker.Data.csproj"/>
-        <ProjectReference Include="..\..\src\NetWorthTracker.Data.Api\NetWorthTracker.Data.Api.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

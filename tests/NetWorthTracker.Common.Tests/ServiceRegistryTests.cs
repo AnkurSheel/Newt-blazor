@@ -5,7 +5,7 @@ using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Business.Features.FinancialSummary.Api;
 using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.Common;
-using NetWorthTracker.Data.Api;
+using NetWorthTracker.Data;
 
 namespace NetWorthTracker.Common.Tests;
 

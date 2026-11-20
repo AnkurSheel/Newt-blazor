@@ -1,4 +1,4 @@
-﻿namespace NetWorthTracker.Data.Api;
+﻿namespace NetWorthTracker.Data;
 
 public interface IAppPaths
 {

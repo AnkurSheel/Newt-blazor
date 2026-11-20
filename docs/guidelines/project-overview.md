@@ -13,7 +13,6 @@ NetWorthTracker/
 │   ├── NetWorthTracker.UI/           # Blazor UI Components, Pages, and Styles (Tailwind CSS, Syncfusion)
 │   ├── NetWorthTracker.Business/     # Feature modules, public operations, models, and persistence ports
 │   ├── NetWorthTracker.Data/         # EF Core DbContext, SQLite repositories & migrations
-│   ├── NetWorthTracker.Data.Api/     # Shared data infrastructure contracts
 │   ├── NetWorthTracker.Common/       # Service registration & DI helper extensions
 │   └── NetWorthTracker.Seeder/       # Database seeder console application for CSV imports
 ├── tests/
@@ -43,9 +42,8 @@ NetWorthTracker/
 ### `NetWorthTracker.Business`
 Contains the Accounts, Monthly Balances, and Financial Summary feature modules. Each module owns its public API and business operations; persistence ports live under `Features/{Accounts,MonthlyBalances,FinancialSummary}/Persistence`. Business-owned contracts, result types, and validation exceptions live in this project.
 
-### `NetWorthTracker.Data.Api` & `NetWorthTracker.Data`
-- `NetWorthTracker.Data.Api`: Shared data infrastructure contracts, including application path access.
-- `NetWorthTracker.Data`: `AppDbContext`, EF Core migrations, SQLite database connection management, and adapters for the Business-owned persistence ports.
+### `NetWorthTracker.Data`
+Contains `IAppPaths`, `AppDbContext`, EF Core migrations, SQLite database connection management, and adapters for the Business-owned persistence ports.
 
 ### `NetWorthTracker.Common`
 - Aggregates dependency injection setups (e.g. `AddNetWorthTrackerServices()`) linking data access and business services for consumption by the UI host or seeders.

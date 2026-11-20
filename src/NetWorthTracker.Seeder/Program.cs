@@ -11,7 +11,6 @@ using NetWorthTracker.Common;
 using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.Data;
-using NetWorthTracker.Data.Api;
 using NetWorthTracker.Seeder;
 
 var builder = Host.CreateApplicationBuilder(args);

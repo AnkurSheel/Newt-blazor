@@ -23,8 +23,7 @@ public sealed class ModuleBoundaryTests
                 "NetWorthTracker.Business",
                 "NetWorthTracker.Data"
             ],
-            ["NetWorthTracker.Data"] = ["NetWorthTracker.Business", "NetWorthTracker.Data.Api"],
-            ["NetWorthTracker.Data.Api"] = [],
+            ["NetWorthTracker.Data"] = ["NetWorthTracker.Business"],
             ["NetWorthTracker.Seeder"] =
             [
                 "NetWorthTracker.Business",
@@ -44,7 +43,8 @@ public sealed class ModuleBoundaryTests
         {
             "NetWorthTracker.Models",
             "NetWorthTracker.Services",
-            "NetWorthTracker.Services.Api"
+            "NetWorthTracker.Services.Api",
+            "NetWorthTracker.Data.Api"
         };
         var solutionRegistrations =
             File.ReadAllText(Path.Combine(repositoryRoot, "NetWorthTracker.sln"))

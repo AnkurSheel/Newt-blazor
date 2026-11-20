@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-using NetWorthTracker.Data.Api;
+using NetWorthTracker.Data;
 
 namespace NetWorthTracker.Data.Tests.TestHelpers;
 
