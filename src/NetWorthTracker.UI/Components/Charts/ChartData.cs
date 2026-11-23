@@ -8,7 +8,7 @@ public class ChartData
         Value = value;
     }
 
-    public string Color => Value >= 0 ? "#10b981" : "#f43f5e";
+    public string Color => Value >= 0 ? "var(--color-chart-positive)" : "var(--color-chart-negative)";
 
     public DateOnly Period { get; }
 

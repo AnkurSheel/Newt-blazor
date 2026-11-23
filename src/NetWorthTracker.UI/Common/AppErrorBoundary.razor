@@ -11,21 +11,21 @@ else if (ErrorContent is not null)
 }
 else
 {
-    <div class="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-slate-100 shadow-lg">
+    <div class="p-4 rounded-xl bg-feedback-error-background/40 border border-feedback-error-outline/60 text-foreground shadow-lg">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
                 <span
-                    class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-rose-950 border border-rose-800/80 text-rose-400 font-bold text-xs shrink-0">!</span>
+                    class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-feedback-error-background border border-feedback-error-outline/80 text-feedback-error font-bold text-xs shrink-0">!</span>
                 <div class="min-w-0 flex-1">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-rose-400 block sm:inline mr-2">Error loading component</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-feedback-error block sm:inline mr-2">Error loading component</span>
                     <span
-                        class="text-sm font-mono text-slate-300 truncate inline-block max-w-full align-bottom">@CurrentException.Message</span>
+                        class="text-sm font-mono text-foreground-tertiary truncate inline-block max-w-full align-bottom">@CurrentException.Message</span>
                 </div>
             </div>
             <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
                 <button type="button"
                         @onclick="Recover"
-                        class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/70 hover:border-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500/50">
+                        class="px-3 py-1.5 text-xs font-medium rounded-lg bg-background-interactive hover:bg-background-hover text-foreground border border-outline-strong/70 hover:border-outline-muted transition-colors focus:outline-none focus:ring-2 focus:ring-feedback-error">
                     Try Again
                 </button>
             </div>
