@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <InternalsVisibleTo Include="NetWorthTracker.Business.Tests"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14"/>
+    </ItemGroup>
+</Project>

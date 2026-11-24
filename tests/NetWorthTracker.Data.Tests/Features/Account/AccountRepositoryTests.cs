@@ -1,4 +1,4 @@
-﻿using NetWorthTracker.Core.Features.Account;
+﻿using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 using NetWorthTracker.Data.Tests.TestHelpers;
@@ -28,29 +28,23 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenNoAccountsExist_ReturnsEmptyList()
     {
-        // Arrange
         var queryDate = new DateOnly(2026, 1, 1);
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         Assert.Empty(result);
     }
 
     [Fact]
     public async Task GetAllAsync_WhenAccountsExistWithoutBalances_ReturnsAccountsWithNullBalance()
     {
-        // Arrange
         var queryDate = new DateOnly(2026, 1, 1);
         await using var dbContext = await _database.CreateDbContextAsync();
         dbContext.Accounts.Add(new AccountEntity("Checking", AccountType.ASSET, new DateOnly(2025, 1, 1), null));
         await dbContext.SaveChangesAsync();
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         var account = Assert.Single(result);
         Assert.Multiple(() => Assert.Equal("Checking", account.Name), () => Assert.Null(account.BalanceOnDate));
     }
@@ -58,7 +52,6 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenBalanceExistsOnSelectedDate_PopulatesBalanceOnDate()
     {
-        // Arrange
         var queryDate = new DateOnly(2026, 1, 1);
         await using var dbContext = await _database.CreateDbContextAsync();
         var entity = new AccountEntity("Checking", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
@@ -68,10 +61,8 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
         dbContext.MonthlyBalances.Add(new MonthlyBalanceEntity(entity.Id, queryDate, 5432.10m));
         await dbContext.SaveChangesAsync();
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         var account = Assert.Single(result);
         Assert.Multiple(
             () => Assert.Equal("Checking", account.Name),
@@ -81,7 +72,6 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenBalanceExistsForDifferentDate_ReturnsNullBalanceOnDate()
     {
-        // Arrange
         var balanceDate = new DateOnly(2025, 12, 1);
         var queryDate = new DateOnly(2026, 1, 1);
         await using var dbContext = await _database.CreateDbContextAsync();
@@ -92,10 +82,8 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
         dbContext.MonthlyBalances.Add(new MonthlyBalanceEntity(entity.Id, balanceDate, 10000.00m));
         await dbContext.SaveChangesAsync();
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         var account = Assert.Single(result);
         Assert.Multiple(() => Assert.Equal("Savings", account.Name), () => Assert.Null(account.BalanceOnDate));
     }
@@ -103,7 +91,6 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_OrdersAccountsByIdAscending()
     {
-        // Arrange
         var queryDate = new DateOnly(2026, 1, 1);
         await using var dbContext = await _database.CreateDbContextAsync();
         dbContext.Accounts.AddRange(
@@ -112,10 +99,8 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
             new AccountEntity("Investment", AccountType.ASSET, new DateOnly(2025, 1, 1), null));
         await dbContext.SaveChangesAsync();
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         Assert.Equal(3, result.Count);
         Assert.Multiple(() => Assert.True(result[0].Id < result[1].Id), () => Assert.True(result[1].Id < result[2].Id));
     }
@@ -123,7 +108,6 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_MapsAllAccountPropertiesCorrectly()
     {
-        // Arrange
         var openDate = new DateOnly(2024, 6, 1);
         var closedDate = new DateOnly(2026, 12, 31);
         var queryDate = new DateOnly(2025, 1, 1);
@@ -132,10 +116,8 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
         dbContext.Accounts.Add(entity);
         await dbContext.SaveChangesAsync();
 
-        // Act
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
-        // Assert
         var account = Assert.Single(result);
         Assert.Multiple(
             () => Assert.Equal(entity.Id, account.Id),
@@ -149,13 +131,10 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task AddAsync_WithValidAccountCreateDto_PersistsAccountToDatabase()
     {
-        // Arrange
         var createDto = new AccountCreateDTO("Emergency Fund", AccountType.ASSET, new DateOnly(2025, 5, 1), null);
 
-        // Act
         await _repository.AddAsync(createDto);
 
-        // Assert
         IReadOnlyList<AccountResponseDTO> accounts = await _repository.GetAllAsync(new DateOnly(2025, 5, 1));
         var savedAccount = Assert.Single(accounts);
         Assert.Multiple(

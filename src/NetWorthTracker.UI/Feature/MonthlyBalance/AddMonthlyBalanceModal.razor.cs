@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-using NetWorthTracker.Core.Features.MonthlyBalance;
+using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 
 namespace NetWorthTracker.UI.Feature.MonthlyBalance;
 

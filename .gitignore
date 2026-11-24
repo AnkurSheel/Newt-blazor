@@ -26,3 +26,8 @@ wwwroot/css/app.css
 .output.txt
 .junie/plans
 *.db*
+/bmad-*
+/_bmad-*
+/_bmad/
+/.agents/skills/bmad-*/
+/.github/agents/bmad-*.agent.md

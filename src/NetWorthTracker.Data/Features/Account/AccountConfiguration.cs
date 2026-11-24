@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
 #endregion
 
 namespace NetWorthTracker.Data.Features.Account;

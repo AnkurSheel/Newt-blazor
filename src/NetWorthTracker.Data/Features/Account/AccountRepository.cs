@@ -1,8 +1,8 @@
 ﻿#region
 using Microsoft.EntityFrameworkCore;
 
-using NetWorthTracker.Core.Features.Account;
-using NetWorthTracker.Data.Api.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
+using NetWorthTracker.Business.Features.Accounts.Persistence;
 #endregion
 
 namespace NetWorthTracker.Data.Features.Account;

@@ -1,5 +1,4 @@
-﻿using NetWorthTracker.Common;
-using NetWorthTracker.Data.Api;
+﻿using NetWorthTracker.Data;
 
 namespace NetWorthTracker.App;
 
