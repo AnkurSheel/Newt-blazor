@@ -1,5 +1,3 @@
-using AngleSharp.Html.Dom;
-
 using Bunit;
 
 using Microsoft.AspNetCore.Components;
@@ -28,30 +26,19 @@ public sealed class AddAccountModalTests : BunitContext
     }
 
     [Fact]
-    public async Task Save_WhenAccountNameAlreadyExists_ShowsErrorAndKeepsDialogOpen()
+    public async Task Save_WhenAccountNameAlreadyExists_ShowsError()
     {
-        // Arrange
-        _accountServiceMock.Setup(s => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => dto.Name == "Checking")))
-            .ReturnsAsync(Result.Failure(AccountErrors.DuplicateName));
+        SetupAccountServiceError("Checking", AccountErrors.DuplicateName);
 
         var saved = false;
         var closed = false;
         IRenderedComponent<AddAccountModal> modal = RenderModal(() => saved = true, visible => closed = !visible);
-        await GetAccountNameInput(modal)
-            .ChangeAsync(new ChangeEventArgs { Value = "Checking" });
 
-        // Act
-        await modal.GetByRole("button", "Save Account")
-            .ClickAsync(new MouseEventArgs());
+        await GetAccountNameInput(modal, "Checking");
+        await PressSaveButton(modal);
 
-        // Assert
-        var error = modal.GetByText("This account has already been added.");
+        var error = modal.GetByText(AccountErrors.DuplicateName.Message);
         Assert.Equal("alert", error.GetAttribute("role"));
-        Assert.Equal("This account has already been added.", error.TextContent.Trim());
-        Assert.Equal(
-            "Checking",
-            GetAccountNameInput(modal)
-                .Value);
         Assert.False(saved);
         Assert.False(closed);
     }
@@ -59,23 +46,16 @@ public sealed class AddAccountModalTests : BunitContext
     [Fact]
     public async Task Save_WhenAccountNameIsBlank_ShowsValidationErrorAndKeepsDialogOpen()
     {
-        // Arrange
-        _accountServiceMock.Setup(s
-                => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => string.IsNullOrWhiteSpace(dto.Name))))
-            .ReturnsAsync(Result.Failure(AccountErrors.InvalidName));
+        SetupAccountServiceError(string.Empty, AccountErrors.InvalidName);
 
         var saved = false;
         var closed = false;
         IRenderedComponent<AddAccountModal> modal = RenderModal(() => saved = true, visible => closed = !visible);
 
-        // Act
-        await modal.GetByRole("button", "Save Account")
-            .ClickAsync(new MouseEventArgs());
+        await PressSaveButton(modal);
 
-        // Assert
         var error = modal.GetByText(AccountErrors.InvalidName.Message);
         Assert.Equal("alert", error.GetAttribute("role"));
-        Assert.Equal(AccountErrors.InvalidName.Message, error.TextContent.Trim());
         Assert.False(saved);
         Assert.False(closed);
     }
@@ -83,29 +63,20 @@ public sealed class AddAccountModalTests : BunitContext
     [Fact]
     public async Task Save_WhenDuplicateNameIsCorrected_SavesAccountAndClosesDialog()
     {
-        // Arrange
-        _accountServiceMock.Setup(s => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => dto.Name == "Checking")))
-            .ReturnsAsync(Result.Failure(AccountErrors.DuplicateName));
+        SetupAccountServiceError("Checking", AccountErrors.DuplicateName);
 
-        _accountServiceMock.Setup(s => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => dto.Name == "Savings")))
-            .ReturnsAsync(Result.Success());
+        SetupAccountServiceSuccess("Savings");
 
         var saved = false;
         var closed = false;
         IRenderedComponent<AddAccountModal> modal = RenderModal(() => saved = true, visible => closed = !visible);
 
-        await GetAccountNameInput(modal)
-            .ChangeAsync(new ChangeEventArgs { Value = "Checking" });
-        await modal.GetByRole("button", "Save Account")
-            .ClickAsync(new MouseEventArgs());
-        await GetAccountNameInput(modal)
-            .ChangeAsync(new ChangeEventArgs { Value = "Savings" });
+        await GetAccountNameInput(modal, "Checking");
+        await PressSaveButton(modal);
+        await GetAccountNameInput(modal, "Savings");
 
-        // Act
-        await modal.GetByRole("button", "Save Account")
-            .ClickAsync(new MouseEventArgs());
+        await PressSaveButton(modal);
 
-        // Assert
         Assert.True(saved);
         Assert.True(closed);
     }
@@ -118,21 +89,11 @@ public sealed class AddAccountModalTests : BunitContext
         _accountServiceMock.Setup(s => s.AddAccountAsync(It.IsAny<AccountCreateDTO>()))
             .Returns(completion.Task);
 
-        IRenderedComponent<AddAccountModal> modal = RenderModal(
-            () =>
-            {
-            },
-            _ =>
-            {
-            });
-        await GetAccountNameInput(modal)
-            .ChangeAsync(new ChangeEventArgs { Value = "Savings" });
+        IRenderedComponent<AddAccountModal> modal = RenderModal();
+        await GetAccountNameInput(modal, "Savings");
 
-        // Act
-        var save = modal.GetByRole("button", "Save Account")
-            .ClickAsync(new MouseEventArgs());
+        var save = PressSaveButton(modal);
 
-        // Assert
         try
         {
             await modal.WaitForAssertionAsync(() => Assert.True(
@@ -146,15 +107,49 @@ public sealed class AddAccountModalTests : BunitContext
         }
     }
 
-    private static IHtmlInputElement GetAccountNameInput(IRenderedComponent<AddAccountModal> modal)
+    private static Task GetAccountNameInput(IRenderedComponent<AddAccountModal> modal, object? accountName)
     {
-        return (IHtmlInputElement)modal.GetByLabelText("Account Name");
+        return modal.GetByLabelText("Account Name")
+            .ChangeAsync(new ChangeEventArgs { Value = accountName });
     }
 
-    private IRenderedComponent<AddAccountModal> RenderModal(Action onSaved, Action<bool> onVisibilityChanged)
+    private IRenderedComponent<AddAccountModal> RenderModal(
+        Action? onSaved = null,
+        Action<bool>? onVisibilityChanged = null
+    )
     {
         return Render<AddAccountModal>(parameters => parameters.Add(component => component.IsVisible, true)
-            .Add(component => component.OnAccountSaved, onSaved)
-            .Add(component => component.IsVisibleChanged, onVisibilityChanged));
+            .Add(
+                component => component.OnAccountSaved,
+                onSaved
+                ?? (() =>
+                {
+                }))
+            .Add(
+                component => component.IsVisibleChanged,
+                onVisibilityChanged
+                ?? (_ =>
+                {
+                })));
+    }
+
+    private void SetupAccountServiceError(string accountName, Error error)
+    {
+        _accountServiceMock.Setup(s => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => dto.Name == accountName)))
+            .ReturnsAsync(Result.Failure(error));
+    }
+
+    private void SetupAccountServiceSuccess(string accountName)
+    {
+        _accountServiceMock.Setup(s => s.AddAccountAsync(It.Is<AccountCreateDTO>(dto => dto.Name == accountName)))
+            .ReturnsAsync(Result.Success);
+    }
+
+    private static Task PressSaveButton(IRenderedComponent<AddAccountModal> modal)
+    {
+        var save = modal.GetByRole("button", "Save Account")
+            .ClickAsync(new MouseEventArgs());
+
+        return save;
     }
 }

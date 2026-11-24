@@ -58,8 +58,8 @@ public static class BunitExtensions
         where TComponent : IComponent
     {
         List<IElement> labels = cut.FindAll("label")
-            .Where(l => l.TextContent.Trim()
-                .Contains(labelText, StringComparison.OrdinalIgnoreCase))
+            .Where(l => NormalizeWhitespace(l.TextContent)
+                .Contains(NormalizeWhitespace(labelText), StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         var matches = new List<IElement>();
@@ -172,5 +172,10 @@ public static class BunitExtensions
 
         return element.TextContent.Trim()
             .Equals(expectedName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string NormalizeWhitespace(string text)
+    {
+        return string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
     }
 }
