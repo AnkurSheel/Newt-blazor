@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2.0] - 2026-11-24
+
 ### Fixed
 
 - Adding an account with a duplicate name shows an error message.
