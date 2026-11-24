@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-using NetWorthTracker.Core.Features.Account;
+using NetWorthTracker.Business.Features.Accounts.Api;
 
 namespace NetWorthTracker.UI.Feature.Account;
 

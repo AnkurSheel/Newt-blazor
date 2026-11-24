@@ -1,6 +1,4 @@
-﻿using NetWorthTracker.Data.Api;
-
-namespace NetWorthTracker.Data.Design;
+﻿namespace NetWorthTracker.Data.Design;
 
 public class DesignTimeAppPaths : IAppPaths
 {

@@ -27,10 +27,8 @@ public sealed class AccountQuerySqlTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAccountsQuery_GeneratesExpectedSqlWithCorrelatedSubquery()
     {
-        // Act - Call repository directly
         await _repository.GetAllAsync(new DateOnly(2026, 1, 1));
 
-        // Assert - Verify actual executed SQL
         await Verify(_database.LastExecutedSql);
     }
 }

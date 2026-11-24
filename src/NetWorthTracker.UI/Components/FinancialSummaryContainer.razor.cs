@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-using NetWorthTracker.Core.Features.FinancialSummary;
+using NetWorthTracker.Business.Features.FinancialSummary.Api;
 
 namespace NetWorthTracker.UI.Components;
 
