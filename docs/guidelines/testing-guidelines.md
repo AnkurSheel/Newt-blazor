@@ -58,6 +58,7 @@ public void CalculateNetWorth_WithValidAssetsAndLiabilities_ReturnsCorrectDiffer
 ### 1.6 Test Observable Behavior, Not Implementation Details
 - **Test the public behavior and contract of classes, services, and components, not their internal mechanics.**
 - Verify *what* the system does (inputs, outputs, state changes, and observable contract side-effects), not *how* it achieves it internally.
+- Prioritize meaningful user-visible behavior and business rules. Do not add tests merely to increase the test count or coverage.
 - Tests should be **resilient to refactoring**: extracting a private helper method, changing internal data structures, or rewriting an internal algorithm without altering observable behavior should never break existing tests.
 - **Do not test private or internal methods directly.** Their behavior and edge cases should be exercised naturally through public APIs.
   - *Exception:* Complex standalone internal algorithms (e.g., specialized math or chunking algorithms) where isolating the test directly provides high diagnostic value.
@@ -123,6 +124,7 @@ public async Task CreateAccount_WhenNameIsDuplicate_ThrowsConflictException()
 
 ### 3.1 Assert One Concept per Test
 - Focus each test method on verifying a single logical concept or behavior.
+- Write one test per distinct behavior; do not add another test that proves the same behavior. Use parameterized cases when different inputs are necessary to establish the behavior or an important boundary, rather than repeating equivalent cases.
 - Asserting one concept can involve multiple `Assert` statements (e.g., inspecting several fields of a returned DTO), as long as they all validate the same conceptual outcome.
 - Do not mix validation of returned data with unrelated side-effect checks (e.g., logging or analytics) within the same test unless that interaction is the core behavior being tested.
 
@@ -193,13 +195,18 @@ When AI agents generate or modify tests in this codebase, use the dedicated [Wri
 
 4. **Test Depth Based on Task Type:**
    - **Bug Fixes:** Write a reproduction test verifying the failure before applying the fix, then verify that the test passes.
-   - **New Features:** Cover the core happy path, validation boundaries, and error/exception paths with clean, dedicated test cases.
+   - **New Features:** Cover distinct meaningful happy-path, validation-boundary, and error behaviors with clean test cases, without duplicating what another test proves.
    - **Refactoring:** Rely on existing unit/component test suites; add tests if edge case coverage was missing.
 
 5. **Avoid Over-Testing Trivialities & Implementation Details:**
    - Do not generate tests for trivial auto-properties, simple DTO fields, default constructors, or 1-to-1 delegation methods.
    - Do not assert against internal implementation details, private member states, or arbitrary intermediate mock calls.
    - Reserve tests for logic that has real potential to fail: business calculations, validation, state mutations, boundary conditions, and error handling.
+
+6. **Plan Tests by Distinct Behavior:**
+    - Merge rows of the I/O and edge-case matrix that would need the same test.
+    - State in the plan's test task that no test may repeat what another test already proves. Check existing tests before planning new ones.
+    - Plan tests for meaningful user behavior and business rules, not trivialities or tests for their own sake.
 
 ---
 
@@ -210,6 +217,7 @@ Before submitting code with tests, verify:
 - [ ] Follows strict Arrange → Act → Assert with no multi-action chaining.
 - [ ] No `if`/`switch`/loop branching inside test methods.
 - [ ] No brittle tests for trivial logic (e.g., auto-properties, parameterless constructors, 1-line delegates, framework features).
+- [ ] Each test proves a distinct meaningful behavior; no test repeats what another test already proves.
 - [ ] Tests verify observable public behavior and contracts, not internal implementation mechanics or private methods.
 - [ ] Setup is minimal and readable; helper builders are parameterized.
 - [ ] Assertions validate individual properties using `Assert.Multiple` where applicable.
