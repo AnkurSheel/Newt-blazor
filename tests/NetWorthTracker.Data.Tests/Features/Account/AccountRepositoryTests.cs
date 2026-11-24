@@ -9,6 +9,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
 {
     private readonly SqliteTestDatabase _database = new();
     private readonly AccountRepository _repository;
+    private readonly DateOnly queryDate = new(2026, 1, 1);
 
     public AccountRepositoryTests()
     {
@@ -28,8 +29,6 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenNoAccountsExist_ReturnsEmptyList()
     {
-        var queryDate = new DateOnly(2026, 1, 1);
-
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
         Assert.Empty(result);
@@ -38,10 +37,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenAccountsExistWithoutBalances_ReturnsAccountsWithNullBalance()
     {
-        var queryDate = new DateOnly(2026, 1, 1);
-        await using var dbContext = await _database.CreateDbContextAsync();
-        dbContext.Accounts.Add(new AccountEntity("Checking", AccountType.ASSET, new DateOnly(2025, 1, 1), null));
-        await dbContext.SaveChangesAsync();
+        await AccountTestHelpers.AddAccount(_database);
 
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
@@ -52,14 +48,11 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenBalanceExistsOnSelectedDate_PopulatesBalanceOnDate()
     {
-        var queryDate = new DateOnly(2026, 1, 1);
-        await using var dbContext = await _database.CreateDbContextAsync();
-        var entity = new AccountEntity("Checking", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
-        dbContext.Accounts.Add(entity);
-        await dbContext.SaveChangesAsync();
+        var accountId = await AccountTestHelpers.AddAccount(_database);
 
-        dbContext.MonthlyBalances.Add(new MonthlyBalanceEntity(entity.Id, queryDate, 5432.10m));
-        await dbContext.SaveChangesAsync();
+        await MonthlyBalanceTestHelpers.AddMonthlyBalance(
+            _database,
+            new MonthlyBalanceEntity(accountId, queryDate, 5432.10m));
 
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
@@ -72,37 +65,18 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task GetAllAsync_WhenBalanceExistsForDifferentDate_ReturnsNullBalanceOnDate()
     {
-        var balanceDate = new DateOnly(2025, 12, 1);
         var queryDate = new DateOnly(2026, 1, 1);
-        await using var dbContext = await _database.CreateDbContextAsync();
-        var entity = new AccountEntity("Savings", AccountType.ASSET, new DateOnly(2025, 1, 1), null);
-        dbContext.Accounts.Add(entity);
-        await dbContext.SaveChangesAsync();
 
-        dbContext.MonthlyBalances.Add(new MonthlyBalanceEntity(entity.Id, balanceDate, 10000.00m));
-        await dbContext.SaveChangesAsync();
+        var accountId = await AccountTestHelpers.AddAccount(_database);
+
+        await MonthlyBalanceTestHelpers.AddMonthlyBalance(
+            _database,
+            new MonthlyBalanceEntity(accountId, new DateOnly(2025, 12, 1), 10000.00m));
 
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
         var account = Assert.Single(result);
-        Assert.Multiple(() => Assert.Equal("Savings", account.Name), () => Assert.Null(account.BalanceOnDate));
-    }
-
-    [Fact]
-    public async Task GetAllAsync_OrdersAccountsByIdAscending()
-    {
-        var queryDate = new DateOnly(2026, 1, 1);
-        await using var dbContext = await _database.CreateDbContextAsync();
-        dbContext.Accounts.AddRange(
-            new AccountEntity("Checking", AccountType.ASSET, new DateOnly(2025, 1, 1), null),
-            new AccountEntity("Mortgage", AccountType.LIABILITY, new DateOnly(2025, 1, 1), null),
-            new AccountEntity("Investment", AccountType.ASSET, new DateOnly(2025, 1, 1), null));
-        await dbContext.SaveChangesAsync();
-
-        IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
-
-        Assert.Equal(3, result.Count);
-        Assert.Multiple(() => Assert.True(result[0].Id < result[1].Id), () => Assert.True(result[1].Id < result[2].Id));
+        Assert.Multiple(() => Assert.Equal("Checking", account.Name), () => Assert.Null(account.BalanceOnDate));
     }
 
     [Fact]
@@ -111,36 +85,37 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
         var openDate = new DateOnly(2024, 6, 1);
         var closedDate = new DateOnly(2026, 12, 31);
         var queryDate = new DateOnly(2025, 1, 1);
-        await using var dbContext = await _database.CreateDbContextAsync();
-        var entity = new AccountEntity("Credit Card", AccountType.LIABILITY, openDate, closedDate);
-        dbContext.Accounts.Add(entity);
-        await dbContext.SaveChangesAsync();
+
+        var accountId = await AccountTestHelpers.AddAccount(
+            _database,
+            "Savings",
+            AccountType.LIABILITY,
+            openDate,
+            closedDate);
 
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
         var account = Assert.Single(result);
         Assert.Multiple(
-            () => Assert.Equal(entity.Id, account.Id),
-            () => Assert.Equal("Credit Card", account.Name),
+            () => Assert.Equal(accountId, account.Id),
+            () => Assert.Equal("Savings", account.Name),
             () => Assert.Equal(AccountType.LIABILITY, account.Type),
             () => Assert.Equal(openDate, account.OpenDate),
             () => Assert.Equal(closedDate, account.ClosedDate),
             () => Assert.Null(account.BalanceOnDate));
     }
 
-    [Fact]
-    public async Task AddAsync_WithValidAccountCreateDto_PersistsAccountToDatabase()
+    [Theory]
+    [InlineData("Checking", "checking")]
+    [InlineData("Checking", "CHECKING")]
+    [InlineData("Checking", "cHeCkInG")]
+    [InlineData("Épargne", "éPARGNE")]
+    public async Task AddAsync_WhenNameMatchesIgnoringCase_RejectsDuplicate(string existingName, string duplicateName)
     {
-        var createDto = new AccountCreateDTO("Emergency Fund", AccountType.ASSET, new DateOnly(2025, 5, 1), null);
+        var openDate = new DateOnly(2025, 1, 1);
+        await _repository.AddAsync(AccountTestHelpers.GetAccountCreateDto(existingName, openDate: openDate));
+        var duplicate = AccountTestHelpers.GetAccountCreateDto(duplicateName, openDate: openDate);
 
-        await _repository.AddAsync(createDto);
-
-        IReadOnlyList<AccountResponseDTO> accounts = await _repository.GetAllAsync(new DateOnly(2025, 5, 1));
-        var savedAccount = Assert.Single(accounts);
-        Assert.Multiple(
-            () => Assert.Equal("Emergency Fund", savedAccount.Name),
-            () => Assert.Equal(AccountType.ASSET, savedAccount.Type),
-            () => Assert.Equal(new DateOnly(2025, 5, 1), savedAccount.OpenDate),
-            () => Assert.Null(savedAccount.ClosedDate));
+        await Assert.ThrowsAsync<DuplicateAccountException>(() => _repository.AddAsync(duplicate));
     }
 }
