@@ -21,4 +21,14 @@ public static class AccountTestHelpers
 
         return account.Id;
     }
+
+    public static AccountCreateDTO GetAccountCreateDto(
+        string accountName = "Checking",
+        AccountType accountType = AccountType.ASSET,
+        DateOnly? openDate = null,
+        DateOnly? closedDate = null
+    )
+    {
+        return new AccountCreateDTO(accountName, accountType, openDate ?? new DateOnly(2025, 1, 1), closedDate);
+    }
 }

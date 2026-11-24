@@ -1,4 +1,5 @@
 ﻿#region
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 using NetWorthTracker.Business.Features.Accounts.Api;
@@ -9,6 +10,7 @@ namespace NetWorthTracker.Data.Features.Account;
 
 public class AccountRepository : IAccountRepository
 {
+    private const int SqliteUniqueContraintErrorCode = 2067;
     private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
     public AccountRepository(IDbContextFactory<AppDbContext> dbContextFactory)
@@ -29,8 +31,8 @@ public class AccountRepository : IAccountRepository
                 Type = accountEntity.Type,
                 OpenDate = accountEntity.OpenDate,
                 ClosedDate = accountEntity.ClosedDate,
-                BalanceOnDate = dbContext.MonthlyBalances
-                    .Where(mb => mb.AccountId == accountEntity.Id && mb.MonthDate == selectedDate)
+                BalanceOnDate = dbContext.MonthlyBalances.Where(mb
+                        => mb.AccountId == accountEntity.Id && mb.MonthDate == selectedDate)
                     .Select(mb => (decimal?)mb.Amount)
                     .FirstOrDefault()
             })
@@ -40,7 +42,26 @@ public class AccountRepository : IAccountRepository
     public async Task AddAsync(AccountCreateDTO account)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        dbContext.Accounts.Add(new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate));
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+            List<string> existingAccountNames = await dbContext.Accounts.Select(existingAccount => existingAccount.Name)
+                .ToListAsync();
+            if (existingAccountNames.Contains(account.Name, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new DuplicateAccountException();
+            }
+
+            dbContext.Accounts.Add(new AccountEntity(account.Name, account.Type, account.OpenDate, account.ClosedDate));
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqliteException
+                                           {
+                                               SqliteExtendedErrorCode: SqliteUniqueContraintErrorCode
+                                           })
+        {
+            throw new DuplicateAccountException(ex);
+        }
     }
 }
