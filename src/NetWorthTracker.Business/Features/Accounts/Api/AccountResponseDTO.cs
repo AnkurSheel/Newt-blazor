@@ -14,6 +14,11 @@ public record AccountResponseDTO
 
     public decimal? BalanceOnDate { get; init; }
 
+    public bool IsActive(DateOnly targetDate)
+    {
+        return OpenDate <= targetDate && (!ClosedDate.HasValue || ClosedDate.Value > targetDate);
+    }
+
     public bool IsClosedOn(DateOnly targetDate)
     {
         return ClosedDate.HasValue && ClosedDate.Value <= targetDate;
