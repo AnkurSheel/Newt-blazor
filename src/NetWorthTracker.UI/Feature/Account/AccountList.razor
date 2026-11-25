@@ -1,8 +1,5 @@
 ﻿@page "/accounts"
 @using NetWorthTracker.Business.Features.Accounts.Api
-@using NetWorthTracker.UI.Feature.MonthlyBalance
-
-@inject IAccountService AccountService
 
 <div>
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
@@ -12,7 +9,7 @@
                 class="inline-flex p-1 bg-background-panel rounded-xl border border-outline/80 text-xs font-medium shadow-inner">
                 @foreach (var status in new[] { "Active", "Closed", "All" })
                 {
-                    <button @onclick="() => _filterStatus = status"
+                    <button @onclick="() => SelectFilterAsync(status)"
                             type="button"
                             class="px-3.5 py-1.5 rounded-lg transition-all duration-150 font-medium @(_filterStatus == status ? "bg-background-interactive text-foreground-inverse shadow-sm border border-outline-strong/50" : "text-foreground-muted hover:text-foreground-secondary hover:bg-background-page/50")">
                         @status
@@ -22,7 +19,7 @@
 
             <span
                 class="text-xs font-medium text-foreground-muted bg-background-page/80 px-2.5 py-1 rounded-full border border-outline/80">
-                @FilteredAccounts.Count() accounts
+                @_accounts.Count accounts
             </span>
         </div>
 
@@ -40,7 +37,7 @@
 
     <!-- Grid Container -->
     <div class="w-full overflow-x-auto rounded-xl border border-outline shadow-2xl bg-background-panel">
-        <SfGrid DataSource="@FilteredAccounts" TValue="AccountResponseDTO" AllowPaging="true" AllowSorting="true"
+        <SfGrid DataSource="@_accounts" TValue="AccountResponseDTO" AllowPaging="true" AllowSorting="true"
                 Width="100%">
             <GridPageSettings PageSize="10" PageSizes="true"></GridPageSettings>
             <GridColumns>
@@ -103,7 +100,14 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.IsClosedOn(SelectedDate))
+                            if (item.OpenDate > SelectedDate)
+                            {
+                                <span
+                                    class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">
+                                    Not yet open
+                                </span>
+                            }
+                            else if (item.IsClosedOn(SelectedDate))
                             {
                                 <span
                                     class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">
@@ -112,64 +116,16 @@
                             }
                             else
                             {
-                                <span class="inline-flex items-center gap-1.5 text-xs text-financial-positive font-medium">
+                                <span
+                                    class="inline-flex items-center gap-1.5 text-xs text-financial-positive font-medium">
                                     <span class="h-1.5 w-1.5 rounded-full bg-financial-positive animate-pulse"></span> Active
                                 </span>
                             }
                         }
                     </Template>
                 </GridColumn>
-
-                <!-- Balance -->
-                <GridColumn Field="@nameof(AccountResponseDTO.BalanceOnDate)" HeaderText="Balance"
-                            TextAlign="TextAlign.Right" Width="20%">
-                    <Template>
-                        @{
-                            var item = (AccountResponseDTO)context;
-                            if (item.BalanceOnDate.HasValue)
-                            {
-                                <span
-                                    class="font-mono text-sm font-semibold @(item.Type == AccountType.LIABILITY ? "text-account-liability" : "text-financial-positive")">
-                                    @(item.BalanceOnDate.Value.ToString("C2"))
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="font-mono text-xs text-foreground-muted italic">No Data</span>
-                            }
-                        }
-                    </Template>
-                </GridColumn>
-
-                <GridColumn HeaderText="Actions" TextAlign="TextAlign.Center" Width="15%">
-                    <Template>
-                        @{
-                            var item = (AccountResponseDTO)context;
-                            if (!item.IsClosedOn(SelectedDate))
-                            {
-                                <button @onclick="() => OpenAddTransactionModal(item)"
-                                        disabled="@item.BalanceOnDate.HasValue"
-                                        title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
-                                        class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
-                                    <span>+ Txn</span>
-                                </button>
-                            }
-                            else
-                            {
-                                <span class="text-xs text-foreground-muted font-medium italic">Closed</span>
-                            }
-                        }
-                    </Template>
-                </GridColumn>
-
             </GridColumns>
         </SfGrid>
     </div>
     <AddAccountModal @bind-IsVisible="@_isOpen" OnAccountSaved="Refresh"/>
-
-    <AddMonthlyBalanceModal @bind-IsVisible="_isTransactionModalOpen"
-                            AccountId="@(_selectedAccountForTransaction?.Id ?? 0)"
-                            AccountName="@(_selectedAccountForTransaction?.Name ?? string.Empty)"
-                            StartingBalance="@(_selectedAccountForTransaction?.BalanceOnDate ?? 0m)"
-                            OnTransactionSaved="Refresh"/>
 </div>

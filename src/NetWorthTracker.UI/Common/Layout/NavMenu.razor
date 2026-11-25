@@ -1,5 +1,4 @@
-﻿@using NetWorthTracker.UI.Components.Icons
-<nav
+﻿<nav
     class="@($"flex flex-col gap-1.5 p-3 min-h-screen bg-background-panel border-r border-outline text-foreground-tertiary select-none transition-all duration-300 {(isCollapsed ? "w-16" : "w-60")}")">
 
     <!-- Header with logo & collapse toggle -->
@@ -39,6 +38,11 @@
     <CustomNavLink IsCollapsed="@isCollapsed" Link="/accounts" Title="Accounts">
         <SvgContent>
             <AccountIcon/>
+        </SvgContent>
+    </CustomNavLink>
+    <CustomNavLink IsCollapsed="@isCollapsed" Link="/monthly-check-in" Title="Monthly Check-in">
+        <SvgContent>
+            <MonthlyCheckInIcon/>
         </SvgContent>
     </CustomNavLink>
 </nav>

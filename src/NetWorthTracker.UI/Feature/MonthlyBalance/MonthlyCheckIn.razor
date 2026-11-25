@@ -1,0 +1,113 @@
+﻿@page "/monthly-check-in"
+@using NetWorthTracker.Business.Features.Accounts.Api
+
+@inject IAccountService AccountService
+
+<div>
+    @if (!Accounts.Any())
+    {
+        <section class="rounded-xl border border-outline bg-background-panel p-6 text-center">
+            <p class="text-sm text-foreground-muted">There are no active accounts for this month.</p>
+            <a href="/accounts" class="mt-3 inline-block text-sm text-brand-accent">Go to Accounts</a>
+        </section>
+    }
+    else
+    {
+        <div class="w-full overflow-x-auto rounded-xl border border-outline shadow-2xl bg-background-panel">
+            <SfGrid DataSource="@Accounts" TValue="AccountResponseDTO" AllowPaging="true" AllowSorting="true"
+                    Width="100%">
+                <GridPageSettings PageSize="10" PageSizes="true"></GridPageSettings>
+                <GridColumns>
+
+                <!-- Account Name -->
+                <GridColumn Field="@nameof(AccountResponseDTO.Name)" HeaderText="Account Name" Width="30%">
+                    <Template>
+                        @{
+                            var item = (AccountResponseDTO)context;
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span
+                                    class="truncate @(item.IsClosedOn(SelectedDate) ? "line-through text-foreground-muted" : "font-medium text-foreground-secondary")"
+                                    title="@item.Name">
+                                    @item.Name
+                                </span>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+
+                <!-- Type -->
+                <GridColumn Field="@nameof(AccountResponseDTO.Type)" HeaderText="Type" Width="15%">
+                    <Template>
+                        @{
+                            var item = (AccountResponseDTO)context;
+                            if (item.Type == AccountType.ASSET)
+                            {
+                                <span
+                                    class="px-2.5 py-1 text-xs font-semibold text-financial-positive bg-financial-positive-background/60 border border-financial-positive-outline/50 rounded-full inline-block">
+                                    Asset
+                                </span>
+                            }
+                            else
+                            {
+                                <span
+                                    class="px-2.5 py-1 text-xs font-semibold text-account-liability bg-account-liability-background/60 border border-account-liability-outline/50 rounded-full inline-block">
+                                    Liability
+                                </span>
+                            }
+                        }
+                    </Template>
+                </GridColumn>
+
+                <!-- Balance -->
+                <GridColumn Field="@nameof(AccountResponseDTO.BalanceOnDate)" HeaderText="Balance"
+                            TextAlign="TextAlign.Right" Width="20%">
+                    <Template>
+                        @{
+                            var item = (AccountResponseDTO)context;
+                            if (item.BalanceOnDate.HasValue)
+                            {
+                                <span
+                                    class="font-mono text-sm font-semibold @(item.Type == AccountType.LIABILITY ? "text-account-liability" : "text-financial-positive")">
+                                    @(item.BalanceOnDate.Value.ToString("C2"))
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="font-mono text-xs text-foreground-muted italic">No Data</span>
+                            }
+                        }
+                    </Template>
+                </GridColumn>
+
+                <GridColumn HeaderText="Actions" TextAlign="TextAlign.Center" Width="15%">
+                    <Template>
+                        @{
+                            var item = (AccountResponseDTO)context;
+                            if (!item.IsClosedOn(SelectedDate))
+                            {
+                                <button @onclick="() => OpenAddTransactionModal(item)"
+                                        disabled="@item.BalanceOnDate.HasValue"
+                                        title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
+                                        class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
+                                    <span>+ Txn</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-xs text-foreground-muted font-medium italic">Closed</span>
+                            }
+                        }
+                    </Template>
+                </GridColumn>
+
+                </GridColumns>
+            </SfGrid>
+        </div>
+    }
+
+    <AddMonthlyBalanceModal @bind-IsVisible="_isTransactionModalOpen"
+                            AccountId="@(_selectedAccountForTransaction?.Id ?? 0)"
+                            AccountName="@(_selectedAccountForTransaction?.Name ?? string.Empty)"
+                            StartingBalance="@(_selectedAccountForTransaction?.BalanceOnDate ?? 0m)"
+                            OnTransactionSaved="Refresh"/>
+</div>

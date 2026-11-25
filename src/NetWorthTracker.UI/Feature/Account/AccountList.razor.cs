@@ -10,38 +10,20 @@ public partial class AccountList
     private string _filterStatus = "Active";
     private bool _isOpen;
 
-    private bool _isTransactionModalOpen;
-
-    private AccountResponseDTO? _selectedAccountForTransaction;
-
     [CascadingParameter]
     public DateOnly SelectedDate { get; set; }
 
-    private IEnumerable<AccountResponseDTO> FilteredAccounts => _filterStatus switch
-    {
-        "Active" => _accounts.Where(a => !a.IsClosedOn(SelectedDate)),
-        "Closed" => _accounts.Where(a => a.IsClosedOn(SelectedDate)),
-        _ => _accounts
-    };
+    [Inject]
+    private IAccountService AccountService { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
+    private async Task Refresh()
     {
         await LoadAccountsAsync();
     }
 
-    private void OpenAddTransactionModal(AccountResponseDTO account)
+    private async Task SelectFilterAsync(string filterStatus)
     {
-        if (account.IsClosedOn(SelectedDate) || account.BalanceOnDate.HasValue)
-        {
-            return;
-        }
-
-        _selectedAccountForTransaction = account;
-        _isTransactionModalOpen = true;
-    }
-
-    private async Task Refresh()
-    {
+        _filterStatus = filterStatus;
         await LoadAccountsAsync();
     }
 
@@ -52,6 +34,11 @@ public partial class AccountList
 
     private async Task LoadAccountsAsync()
     {
-        _accounts = await AccountService.GetAccountsAsync(SelectedDate);
+        _accounts = _filterStatus switch
+        {
+            "Active" => await AccountService.GetActiveAccountsAsync(SelectedDate),
+            "Closed" => await AccountService.GetClosedAccountsAsync(SelectedDate),
+            _ => await AccountService.GetAccountsAsync(SelectedDate)
+        };
     }
 }

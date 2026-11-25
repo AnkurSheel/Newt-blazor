@@ -1,3 +1,5 @@
+using Moq;
+
 using NetWorthTracker.Business.Features.Accounts.Api;
 
 namespace NetWorthTracker.TestHelpers;
@@ -22,5 +24,23 @@ public static class AccountTestHelpers
             ClosedDate = closedDate,
             BalanceOnDate = balanceOnDate
         };
+    }
+
+    public static void SetupActiveAccountService(
+        Mock<IAccountService> accountService,
+        IReadOnlyList<AccountResponseDTO> value
+    )
+    {
+        accountService.Setup(service => service.GetActiveAccountsAsync(It.IsAny<DateOnly>()))
+            .ReturnsAsync(value);
+    }
+
+    public static void SetupClosedAccountService(
+        Mock<IAccountService> accountService,
+        IReadOnlyList<AccountResponseDTO> value
+    )
+    {
+        accountService.Setup(service => service.GetClosedAccountsAsync(It.IsAny<DateOnly>()))
+            .ReturnsAsync(value);
     }
 }
