@@ -1,5 +1,71 @@
 ﻿@import "tailwindcss";
 
+@theme static {
+  /* Application surfaces */
+  --color-background-page: var(--color-slate-900);
+  --color-background-panel: var(--color-slate-950);
+  --color-background-overlay: var(--color-slate-950);
+  --color-background-interactive: var(--color-slate-800);
+  --color-background-hover: var(--color-slate-700);
+
+  /* Text and outlines */
+  --color-foreground: var(--color-slate-100);
+  --color-foreground-secondary: var(--color-slate-200);
+  --color-foreground-tertiary: var(--color-slate-300);
+  --color-foreground-muted: var(--color-slate-400);
+  --color-foreground-disabled: var(--color-slate-500);
+  --color-foreground-faint: var(--color-slate-600);
+  --color-foreground-inverse: var(--color-white);
+  --color-outline: var(--color-slate-800);
+  --color-outline-strong: var(--color-slate-700);
+  --color-outline-muted: var(--color-slate-600);
+
+  /* Brand actions */
+  --color-brand-accent: var(--color-indigo-400);
+  --color-brand-accent-muted: var(--color-indigo-300);
+  --color-brand-primary: var(--color-indigo-600);
+  --color-brand-primary-hover: var(--color-indigo-500);
+  --color-brand-primary-active: var(--color-indigo-700);
+  --color-brand-outline: var(--color-indigo-800);
+  --color-brand-background: var(--color-indigo-950);
+  --color-brand-background-hover: var(--color-indigo-900);
+
+  /* Account and feedback states */
+  --color-financial-positive: var(--color-emerald-400);
+  --color-financial-positive-emphasis: var(--color-emerald-500);
+  --color-financial-positive-outline: var(--color-emerald-800);
+  --color-financial-positive-background: var(--color-emerald-950);
+  --color-account-liability: var(--color-rose-400);
+  --color-account-liability-focus: var(--color-rose-500);
+  --color-account-liability-outline: var(--color-rose-800);
+  --color-account-liability-background: var(--color-rose-950);
+  --color-feedback-error: var(--color-rose-400);
+  --color-feedback-error-focus: var(--color-rose-500);
+  --color-feedback-error-outline: var(--color-rose-800);
+  --color-feedback-error-background: var(--color-rose-950);
+  --color-trend-negative: var(--color-red-400);
+  --color-trend-negative-emphasis: var(--color-red-500);
+
+  /* Financial summary cards */
+  --color-metric-asset: var(--color-teal-400);
+  --color-metric-asset-outline: var(--color-teal-500);
+  --color-metric-asset-background: var(--color-teal-800);
+  --color-metric-liability: var(--color-rose-400);
+  --color-metric-liability-outline: var(--color-rose-500);
+  --color-metric-liability-background: var(--color-rose-800);
+  --color-metric-net-worth: var(--color-violet-400);
+  --color-metric-net-worth-outline: var(--color-violet-500);
+  --color-metric-net-worth-background: var(--color-violet-800);
+
+  /* Syncfusion charts */
+  --color-chart-axis: var(--color-outline-strong);
+  --color-chart-grid: var(--color-outline);
+  --color-chart-area-outline: var(--color-brand-accent);
+  --color-chart-area-fill: color-mix(in srgb, var(--color-brand-accent) 15%, transparent);
+  --color-chart-positive: var(--color-financial-positive-emphasis);
+  --color-chart-negative: var(--color-rose-500);
+}
+
 @source "../**/*.razor";
 @source "../**/*.razor.cs";
 @source "../**/*.html";

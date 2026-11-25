@@ -1,19 +1,18 @@
-﻿@using NetWorthTracker.UI.Components.Icons
-<nav
-    class="@($"flex flex-col gap-1.5 p-3 min-h-screen bg-slate-950 border-r border-slate-800 text-slate-300 select-none transition-all duration-300 {(isCollapsed ? "w-16" : "w-60")}")">
+﻿<nav
+    class="@($"flex flex-col gap-1.5 p-3 min-h-screen bg-background-panel border-r border-outline text-foreground-tertiary select-none transition-all duration-300 {(isCollapsed ? "w-16" : "w-60")}")">
 
     <!-- Header with logo & collapse toggle -->
-    <div class="flex items-center justify-between px-2 py-3 mb-3 border-b border-slate-800/80">
+    <div class="flex items-center justify-between px-2 py-3 mb-3 border-b border-outline/80">
         <div class="flex items-center gap-2.5 overflow-hidden">
             <div
-                class="h-8 w-8 shrink-0 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/20">
+                class="h-8 w-8 shrink-0 rounded-lg bg-brand-primary flex items-center justify-center text-foreground-inverse font-bold text-sm shadow-md shadow-brand-primary-hover/20">
                 NW
             </div>
             @if (!isCollapsed)
             {
                 <div class="truncate">
-                    <span class="font-bold text-sm tracking-wide text-white block">Net Worth</span>
-                    <span class="text-[10px] font-medium text-slate-500 uppercase tracking-wider block">Tracker</span>
+                    <span class="font-bold text-sm tracking-wide text-foreground-inverse block">Net Worth</span>
+                    <span class="text-[10px] font-medium text-foreground-disabled uppercase tracking-wider block">Tracker</span>
                 </div>
             }
         </div>
@@ -21,7 +20,7 @@
         <button @onclick="ToggleNav"
                 type="button"
                 aria-label="Toggle navigation"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition focus:outline-none">
+                class="p-1.5 rounded-lg text-foreground-muted hover:text-foreground-inverse hover:bg-background-interactive/80 transition focus:outline-none focus:ring-2 focus:ring-brand-accent">
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="@($"h-4 w-4 transform transition-transform duration-300 {(isCollapsed ? "rotate-180" : "")}")"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -39,6 +38,11 @@
     <CustomNavLink IsCollapsed="@isCollapsed" Link="/accounts" Title="Accounts">
         <SvgContent>
             <AccountIcon/>
+        </SvgContent>
+    </CustomNavLink>
+    <CustomNavLink IsCollapsed="@isCollapsed" Link="/monthly-check-in" Title="Monthly Check-in">
+        <SvgContent>
+            <MonthlyCheckInIcon/>
         </SvgContent>
     </CustomNavLink>
 </nav>

@@ -17,5 +17,6 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\NetWorthTracker.Business\NetWorthTracker.Business.csproj"/>
+        <ProjectReference Include="..\NetWorthTracker.TestHelpers\NetWorthTracker.TestHelpers.csproj"/>
     </ItemGroup>
 </Project>

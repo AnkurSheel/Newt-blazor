@@ -22,10 +22,10 @@ public partial class FinancialCardSummary : ComponentBase
     {
         return PercentageChange switch
         {
-            0 => "text-slate-400 bg-slate-900 border-slate-800",
+            0 => "text-foreground-muted bg-background-page border-outline",
             _ => IsPositiveOutcome()
-                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                : "bg-red-500/10 text-red-400 border-red-500/20"
+                ? "bg-financial-positive-emphasis/10 text-financial-positive border-financial-positive-emphasis/20"
+                : "bg-trend-negative-emphasis/10 text-trend-negative border-trend-negative-emphasis/20"
         };
     }
 
@@ -33,10 +33,10 @@ public partial class FinancialCardSummary : ComponentBase
     {
         return SummaryType switch
         {
-            SummaryType.ASSET => "bg-teal-800/20 text-teal-400 border-teal-500/20",
-            SummaryType.LIABILITY => "bg-rose-800/20 text-rose-400 border-rose-500/20",
-            SummaryType.NETWORTH => "bg-violet-800/20 text-violet-400 border-violet-500/20",
-            _ => "bg-slate-900 text-slate-400 border-slate-800"
+            SummaryType.ASSET => "bg-metric-asset-background/20 text-metric-asset border-metric-asset-outline/20",
+            SummaryType.LIABILITY => "bg-metric-liability-background/20 text-metric-liability border-metric-liability-outline/20",
+            SummaryType.NETWORTH => "bg-metric-net-worth-background/20 text-metric-net-worth border-metric-net-worth-outline/20",
+            _ => "bg-background-page text-foreground-muted border-outline"
         };
     }
 

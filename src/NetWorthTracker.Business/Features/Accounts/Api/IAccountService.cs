@@ -6,5 +6,9 @@ public interface IAccountService
 {
     Task<IReadOnlyList<AccountResponseDTO>> GetAccountsAsync(DateOnly selectedDate);
 
+    Task<IReadOnlyList<AccountResponseDTO>> GetActiveAccountsAsync(DateOnly selectedDate);
+
+    Task<IReadOnlyList<AccountResponseDTO>> GetClosedAccountsAsync(DateOnly selectedDate);
+
     Task<Result> AddAccountAsync(AccountCreateDTO account);
 }

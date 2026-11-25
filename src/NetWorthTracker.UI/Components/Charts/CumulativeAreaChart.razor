@@ -1,8 +1,8 @@
 ﻿@using Syncfusion.Blazor.Charts
 @using ValueType = Syncfusion.Blazor.Charts.ValueType
 
-<div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-md">
-    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">@Title</h3>
+<div class="bg-background-page/90 border border-outline rounded-xl p-4 flex flex-col justify-between shadow-md">
+    <h3 class="text-xs font-bold uppercase tracking-wider text-foreground-muted mb-2">@Title</h3>
 
     <div class="h-48">
         <SfChart Background="transparent">
@@ -12,10 +12,10 @@
                                EdgeLabelPlacement="EdgeLabelPlacement.Shift"
                                LabelIntersectAction="LabelIntersectAction.Hide">
                 <ChartAxisMajorGridLines Width="0"/>
-                <ChartAxisLineStyle Width="0.5" Color="#334155"/>
+                <ChartAxisLineStyle Width="0.5" Color="var(--color-chart-axis)"/>
             </ChartPrimaryXAxis>
             <ChartPrimaryYAxis LabelFormat="@Format">
-                <ChartAxisMajorGridLines Width="0.5" Color="#1e293b"/>
+                <ChartAxisMajorGridLines Width="0.5" Color="var(--color-chart-grid)"/>
                 <ChartAxisLineStyle Width="0"/>
             </ChartPrimaryYAxis>
             <ChartSeriesCollection>
@@ -23,9 +23,9 @@
                              XName="Period"
                              YName="Value"
                              Type="ChartSeriesType.SplineArea"
-                             Fill="rgba(129, 140, 248, 0.15)"
+                             Fill="var(--color-chart-area-fill)"
                              Width="2.5">
-                    <ChartSeriesBorder Color="#818cf8" Width="2.5"/>
+                    <ChartSeriesBorder Color="var(--color-chart-area-outline)" Width="2.5"/>
                     @if (ShowMarkers)
                     {
                         <ChartMarker Visible="true" Height="5" Width="5" Shape="ChartShape.Diamond">
