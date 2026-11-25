@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.Business.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.Architecture.Tests", "tests\NetWorthTracker.Architecture.Tests\NetWorthTracker.Architecture.Tests.csproj", "{0F411B16-2834-4758-A367-6A1A0BC5EA22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWorthTracker.TestHelpers", "tests\NetWorthTracker.TestHelpers\NetWorthTracker.TestHelpers.csproj", "{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,18 @@ Global
 		{0F411B16-2834-4758-A367-6A1A0BC5EA22}.Release|x64.Build.0 = Release|Any CPU
 		{0F411B16-2834-4758-A367-6A1A0BC5EA22}.Release|x86.ActiveCfg = Release|Any CPU
 		{0F411B16-2834-4758-A367-6A1A0BC5EA22}.Release|x86.Build.0 = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|x64.Build.0 = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Debug|x86.Build.0 = Debug|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|x64.ActiveCfg = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|x64.Build.0 = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|x86.ActiveCfg = Release|Any CPU
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,5 +186,6 @@ Global
 		{68C3F911-1C76-46DF-901E-10FDD8A7D9EE} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{3FFA2D17-8C19-447C-A7EF-B244A11C5C4F} = {A44969FC-8904-4FFD-83E5-59838F1566A1}
 		{0F411B16-2834-4758-A367-6A1A0BC5EA22} = {A44969FC-8904-4FFD-83E5-59838F1566A1}
+		{091BA92F-9BDE-44DF-A22C-55B9D3D08AB0} = {A44969FC-8904-4FFD-83E5-59838F1566A1}
 	EndGlobalSection
 EndGlobal
