@@ -40,18 +40,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Cache MAUI Workload
-        id: cache-maui-workload
-        uses: actions/cache@v6
-        with:
-          path: |
-            C:\Program Files\dotnet\packs
-            C:\Program Files\dotnet\sdk-manifests
-            C:\Program Files\dotnet\template-packs
-            C:\Program Files\dotnet\metadata
-          key: ${{ runner.os }}-maui-workload-net10-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
-          restore-keys: |
-            ${{ runner.os }}-maui-workload-net10-
+#      - name: Cache MAUI Workload
+#        id: cache-maui-workload
+#        uses: actions/cache@v6
+#        with:
+#          path: |
+#            C:\Program Files\dotnet\packs
+#            C:\Program Files\dotnet\sdk-manifests
+#            C:\Program Files\dotnet\template-packs
+#            C:\Program Files\dotnet\metadata
+#          key: ${{ runner.os }}-maui-workload-net10-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+#          restore-keys: |
+#            ${{ runner.os }}-maui-workload-net10-
 
       - name: Install MAUI Workload
         if: steps.cache-maui-workload.outputs.cache-hit != 'true'
