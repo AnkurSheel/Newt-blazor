@@ -63,6 +63,23 @@ public sealed class MonthlyCheckInTests : BunitContext
         });
     }
 
+        [Fact]
+        public async Task WhenBalanceIsMissing_AddActionOpensModal()
+        {
+            AccountTestHelpers.SetupActiveAccountService(
+                _accountService,
+                new List<AccountResponseDTO>
+                {
+                    AccountTestHelpers.CreateAccountResponseDto(name: "Checking")
+                });
+
+            IRenderedComponent<CascadingValue<DateOnly>> cut = RenderCheckIn(_selectedDate);
+
+            await cut.GetByRole("button", "+ Txn").ClickAsync();
+
+            await cut.WaitForAssertionAsync(() => Assert.Contains("Save Transaction", cut.Markup));
+        }
+
     [Fact]
     public async Task WhenBalanceIsMissing_DisplaysEnabledAddTransaction()
     {

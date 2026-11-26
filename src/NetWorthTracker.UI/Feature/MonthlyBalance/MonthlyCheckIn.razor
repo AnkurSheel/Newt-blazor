@@ -83,19 +83,12 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (!item.IsClosedOn(SelectedDate))
-                            {
-                                <button @onclick="() => OpenAddTransactionModal(item)"
-                                        disabled="@item.BalanceOnDate.HasValue"
-                                        title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
-                                        class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
-                                    <span>+ Txn</span>
-                                </button>
-                            }
-                            else
-                            {
-                                <span class="text-xs text-foreground-muted font-medium italic">Closed</span>
-                            }
+                            <button @onclick="() => OpenAddTransactionModal(item)"
+                                    disabled="@item.BalanceOnDate.HasValue"
+                                    title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
+                                    class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
+                                <span>+ Txn</span>
+                            </button>
                         }
                     </Template>
                 </GridColumn>
