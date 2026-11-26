@@ -55,8 +55,8 @@ internal sealed class AccountService : IAccountService
 
     public async Task<bool> IsAccountActive(int accountId, DateOnly selectedDate)
     {
-        IReadOnlyList<AccountResponseDTO> activeAccounts = await GetActiveAccountsAsync(selectedDate);
+        AccountResponseDTO? account = await _repository.GetByIdAsync(accountId, selectedDate);
 
-        return activeAccounts.Any(account => account.Id == accountId);
+        return account?.IsActive(selectedDate) ?? false;
     }
 }

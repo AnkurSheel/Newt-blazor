@@ -31,4 +31,12 @@ public sealed class AccountQuerySqlTests : IAsyncLifetime
 
         await Verify(_database.LastExecutedSql);
     }
+
+    [Fact]
+    public async Task GetAccountByIdQuery_GeneratesExpectedSqlWithAccountFilterAndBalanceSubquery()
+    {
+        await _repository.GetByIdAsync(42, new DateOnly(2026, 1, 1));
+
+        await Verify(_database.LastExecutedSql);
+    }
 }

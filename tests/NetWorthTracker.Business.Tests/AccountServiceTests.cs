@@ -90,14 +90,10 @@ public sealed class AccountServiceTests
     public async Task IsAccountActive_WhenAccountIsActiveOnSelectedDate_ReturnsTrue()
     {
         var selectedDate = new DateOnly(2026, 6, 15);
-        SetupAccountsForDate(
+        SetupAccountById(
+            1,
             selectedDate,
-            AccountTestHelpers.CreateAccountResponseDto(1, "Checking", new DateOnly(2026, 1, 1)),
-            AccountTestHelpers.CreateAccountResponseDto(
-                2,
-                "Closed",
-                new DateOnly(2026, 1, 1),
-                selectedDate));
+            AccountTestHelpers.CreateAccountResponseDto(1, "Checking", new DateOnly(2026, 1, 1)));
 
         var result = await _accountService.IsAccountActive(1, selectedDate);
 
@@ -108,7 +104,8 @@ public sealed class AccountServiceTests
     public async Task IsAccountActive_WhenAccountIsNotActiveOnSelectedDate_ReturnsFalse()
     {
         var selectedDate = new DateOnly(2026, 6, 15);
-        SetupAccountsForDate(
+        SetupAccountById(
+            1,
             selectedDate,
             AccountTestHelpers.CreateAccountResponseDto(
                 1,
@@ -121,9 +118,26 @@ public sealed class AccountServiceTests
         Assert.False(result);
     }
 
+    [Fact]
+    public async Task IsAccountActive_WhenAccountDoesNotExist_ReturnsFalse()
+    {
+        var selectedDate = new DateOnly(2026, 6, 15);
+        SetupAccountById(1, selectedDate, null);
+
+        var result = await _accountService.IsAccountActive(1, selectedDate);
+
+        Assert.False(result);
+    }
+
     private void SetupAccountsForDate(DateOnly selectedDate, params AccountResponseDTO[] accounts)
     {
         _accountRepository.Setup(repository => repository.GetAllAsync(selectedDate))
             .ReturnsAsync(accounts);
+    }
+
+    private void SetupAccountById(int accountId, DateOnly selectedDate, AccountResponseDTO? account)
+    {
+        _accountRepository.Setup(repository => repository.GetByIdAsync(accountId, selectedDate))
+            .ReturnsAsync(account);
     }
 }

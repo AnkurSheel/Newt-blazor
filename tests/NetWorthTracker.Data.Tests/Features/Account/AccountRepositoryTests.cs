@@ -105,6 +105,41 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
             () => Assert.Null(account.BalanceOnDate));
     }
 
+    [Fact]
+    public async Task GetByIdAsync_WhenAccountExists_ReturnsRequestedAccount()
+    {
+        var requestedAccountId = await AccountTestHelpers.AddAccount(
+            _database,
+            "Requested",
+            AccountType.ASSET,
+            new DateOnly(2024, 6, 1));
+        await AccountTestHelpers.AddAccount(
+            _database,
+            "Other",
+            AccountType.LIABILITY,
+            new DateOnly(2024, 6, 1));
+        await MonthlyBalanceTestHelpers.AddMonthlyBalance(
+            _database,
+            new MonthlyBalanceEntity(requestedAccountId, queryDate, 5432.10m));
+
+        AccountResponseDTO? result = await _repository.GetByIdAsync(requestedAccountId, queryDate);
+
+        Assert.NotNull(result);
+        Assert.Multiple(
+            () => Assert.Equal(requestedAccountId, result.Id),
+            () => Assert.Equal("Requested", result.Name),
+            () => Assert.Equal(AccountType.ASSET, result.Type),
+            () => Assert.Equal(5432.10m, result.BalanceOnDate));
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenAccountDoesNotExist_ReturnsNull()
+    {
+        AccountResponseDTO? result = await _repository.GetByIdAsync(42, queryDate);
+
+        Assert.Null(result);
+    }
+
     [Theory]
     [InlineData("Checking", "checking")]
     [InlineData("Checking", "CHECKING")]
