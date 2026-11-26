@@ -61,6 +61,19 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
         Assert.Null(result);
     }
 
+    [Fact]
+    public async Task AddAsync_WhenBalanceAlreadyExistsForMonth_ThrowsDuplicateMonthlyBalanceException()
+    {
+        var balanceDate = new DateOnly(2026, 2, 1);
+        var accountId = await AccountTestHelpers.AddAccount(_database);
+        await AddMonthlyBalance(accountId, balanceDate, 3200m);
+
+        var exception = await Assert.ThrowsAsync<DuplicateMonthlyBalanceException>(
+            () => AddMonthlyBalance(accountId, balanceDate.AddDays(10), 3400m));
+
+        Assert.IsType<Microsoft.Data.Sqlite.SqliteException>(exception.InnerException?.InnerException);
+    }
+
     private async Task AddMonthlyBalance(int accountId, DateOnly balanceDate, decimal amount)
     {
         var createDto = new MonthlyBalanceCreateDTO(accountId, balanceDate, amount);
