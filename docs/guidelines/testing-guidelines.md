@@ -13,13 +13,14 @@ This document defines testing standards, patterns, and guidelines for AI agents 
 - Avoid excessive inheritance or overly complex base test classes that obscure the test flow.
 
 ### 1.2 Test Names Must Convey Behavior & Outcome
-- Test names must clearly describe the **condition/state** being tested and the **expected outcome**.
+- Write test names in plain English that describe the **behavior and expected outcome**, adding the relevant condition when needed.
+- Describe what happens, not the method or implementation used. Use sentence-style underscores: capitalize the first word, lowercase every later word, and separate words with underscores.
+- Put the behavior or outcome first, followed by its condition where useful. For example, use `Creating_closed_account_is_rejected_when_closing_month_is_not_after_opening_month`, not `WhenClosingMonthIsInvalid_ReturnsError`.
 - **Prohibited:** Vague names such as `GetUser_HappyPath`, `Test1`, `Calculate_Success`, or `AccountListTest`.
-- **Recommended Patterns:**
-  - `CanRetrieveAccountById`
-  - `WhenAccountNotFound_ReturnsNotFoundError`
-  - `CalculateNetWorth_WhenLiabilitiesExceedAssets_ReturnsNegativeValue`
-  - `AddMonthlyBalance_WhenDuplicateMonthExists_ThrowsValidationException`
+- **Examples:**
+  - `Net_worth_is_negative_when_liabilities_exceed_assets`
+  - `Projects_follow_the_permitted_dependency_graph`
+  - `A_duplicate_monthly_balance_is_rejected`
 
 ### 1.3 Strict Arrange → Act → Assert (AAA) Structure
 - Every test must follow a single, unbroken **Arrange → Act → Assert** sequence:
@@ -27,10 +28,11 @@ This document defines testing standards, patterns, and guidelines for AI agents 
   2. **Act:** Execute the single action under test.
   3. **Assert:** Verify the expected outcome.
 - **Rule:** A single test must not contain repeated Act/Assert chains (e.g., Arrange → Act → Assert → Act → Assert). If a scenario requires multiple actions and intermediate checks, split it into separate, distinct test cases.
+- Setup may perform actions needed to establish the state, but each test must exercise one action under test and assert its outcome. Split multi-step journeys into distinct tests for their meaningful transitions.
 
 ```csharp
 [Fact]
-public void CalculateNetWorth_WithValidAssetsAndLiabilities_ReturnsCorrectDifference()
+public void NetWorthIsAssetsMinusLiabilities()
 {
     // Arrange
     var assets = 150_000m;
@@ -48,7 +50,7 @@ public void CalculateNetWorth_WithValidAssetsAndLiabilities_ReturnsCorrectDiffer
 ### 1.4 Test Both Sides of Flags and Conditional Logic
 - When feature flags, configuration toggles, or conditional branches exist, always write separate, explicit tests for both the **enabled/on** path and the **disabled/off** path.
 - If testing the disabled state is difficult, document the rationale in comments and verify manually.
-- **Keep flag logic out of parameterized tests (`[Theory]` / `[InlineData]`):** Avoid passing boolean flag parameters into test cases to toggle branches. Instead, write dedicated test methods (e.g., `CanExportMonthlyBalances_FlagOn` and `CanExportMonthlyBalances_FlagOff`).
+- **Keep flag logic out of parameterized tests (`[Theory]` / `[InlineData]`):** Use separate `[Fact]` tests for each branch instead of a boolean parameter that selects test setup or assertions (e.g., `CanExportMonthlyBalances_FlagOn` and `CanExportMonthlyBalances_FlagOff`). Boolean inputs that are themselves the behavior under test may still be parameterized.
 
 ### 1.5 No Branching Logic in Tests
 - Do not use `if`, `switch`, `while`, or `for` loops inside test methods.
@@ -101,7 +103,7 @@ public void CalculateNetWorth_WithValidAssetsAndLiabilities_ReturnsCorrectDiffer
 ```csharp
 // Good: Immediately clear what is unique about this test
 [Fact]
-public async Task CreateAccount_WhenNameIsDuplicate_ThrowsConflictException()
+public async Task WhenAccountNameIsDuplicate_AConflictErrorIsRaised()
 {
     // Arrange
     var existingAccount = CreateValidAccount(name: "Savings");
@@ -143,14 +145,15 @@ Assert.Equal(AccountType.Asset, result.Type);
 Assert.Equal(1250.00m, result.Balance);
 ```
 
-- *Exception:* When explicitly validating a mapping contract (e.g., AutoMapper or manual DTO mapping), create a dedicated test named `AllFieldsAreMappedCorrectly` and intentionally assert complete structural equivalence.
+- *Exception:* When explicitly validating a mapping contract (e.g., AutoMapper or manual DTO mapping), use a dedicated test and intentionally assert complete structural equivalence.
+- When an error result's public contract includes both a code and a message, assert both properties separately. Use `Assert.Multiple` when checking them together so a test cannot pass while one part of the error contract regresses.
 
 ### 3.3 Use `Assert.Multiple` for Multiple Assertions
 - When asserting multiple properties within a single concept, wrap them in `Assert.Multiple` so that all assertion failures are reported simultaneously rather than failing on the first mismatch.
 
 ```csharp
 [Fact]
-public void MapToResponseDto_MapsAllCoreProperties()
+public void AccountResponseIncludesAllMappedProperties()
 {
     // Arrange
     var account = new AccountEntity
@@ -178,11 +181,12 @@ public void MapToResponseDto_MapsAllCoreProperties()
 
 ## 4. Specific Guidelines for AI Agents
 
-When AI agents generate or modify tests in this codebase, use the dedicated [Write Tests Skill](skills/write-tests.md) (`write-tests`) and ensure the following behavioral constraints are strictly observed:
+When generating or modifying tests, follow these guidelines and use existing test helpers where applicable.
 
 1. **Never Weaken or Skip Failing Tests:**
    - Never suppress failing tests by removing assertions, reducing assertion strictness, adding `[Fact(Skip = "...")]`, or stubbing out logic with fake mocks to bypass errors.
    - Fix the underlying implementation or correctly align test expectations with requirements.
+   - Before treating a removed assertion as lost coverage, check whether the remaining assertions already imply it (for example, a derived value fully determined by asserted inputs). Keep assertions for independent observable contract behavior; avoid restoring assertions that add no coverage.
 
 2. **Deterministic & Time-Independent Tests:**
    - Never rely on `DateTime.Now` or `DateTime.UtcNow` directly in test assertions. Use fixed dates (e.g., `new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)`) or injectable time providers (`TimeProvider`).
@@ -191,7 +195,8 @@ When AI agents generate or modify tests in this codebase, use the dedicated [Wri
 3. **Blazor UI Component Tests (bUnit):**
    - Use `bUnit` for Blazor component testing in `tests/NetWorthTracker.UI.Tests`.
    - Test user interactions via bUnit semantic triggers (e.g., `button.Click()`, `input.Change(...)`).
-   - Assert rendered markup using semantic elements and CSS classes defined in the [UI Style Guide](ui-style-guide.md).
+   - Assert rendered behavior using semantic elements, text, and accessible attributes rather than CSS classes or other styling.
+   - A bUnit click can dispatch an event handler even when its rendered button is disabled. When enabled/disabled state is part of the behavior, assert the rendered `disabled` attribute directly; a click test alone does not prove the control is enabled.
 
 4. **Test Depth Based on Task Type:**
    - **Bug Fixes:** Write a reproduction test verifying the failure before applying the fix, then verify that the test passes.
@@ -208,12 +213,15 @@ When AI agents generate or modify tests in this codebase, use the dedicated [Wri
     - State in the plan's test task that no test may repeat what another test already proves. Check existing tests before planning new ones.
     - Plan tests for meaningful user behavior and business rules, not trivialities or tests for their own sake.
 
+7. **Avoid Concurrent Builds of Shared Outputs:**
+   - When test projects share build outputs, use one filtered solution test command or run the project test commands sequentially.
+
 ---
 
 ## 5. Summary Checklist for AI Agents
 
 Before submitting code with tests, verify:
-- [ ] Test names describe state and expected outcome (`CanDoX` / `WhenX_ShouldY`).
+- [ ] Test names describe the condition and expected outcome in plain English, without coupling to implementation methods.
 - [ ] Follows strict Arrange → Act → Assert with no multi-action chaining.
 - [ ] No `if`/`switch`/loop branching inside test methods.
 - [ ] No brittle tests for trivial logic (e.g., auto-properties, parameterless constructors, 1-line delegates, framework features).
@@ -221,5 +229,6 @@ Before submitting code with tests, verify:
 - [ ] Tests verify observable public behavior and contracts, not internal implementation mechanics or private methods.
 - [ ] Setup is minimal and readable; helper builders are parameterized.
 - [ ] Assertions validate individual properties using `Assert.Multiple` where applicable.
+- [ ] Error-result tests assert both code and message when both are part of the public contract.
 - [ ] No over-specified mocks or spies; test doubles/fakes used where appropriate for integration tests.
 - [ ] All tests compile with zero warnings and pass cleanly (`dotnet test`).
