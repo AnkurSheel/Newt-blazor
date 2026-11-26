@@ -48,24 +48,22 @@ public sealed class AccountServiceTests
     {
         var selectedDate = new DateOnly(2026, 6, 15);
 
-        _accountRepository.Setup(repository => repository.GetAllAsync(selectedDate))
-            .ReturnsAsync(
-            [
-                AccountTestHelpers.CreateAccountResponseDto(1, "Opened today", selectedDate),
-                AccountTestHelpers.CreateAccountResponseDto(2, "Opened before", new DateOnly(2026, 6, 14)),
-                AccountTestHelpers.CreateAccountResponseDto(3, "Future opening", new DateOnly(2026, 6, 16)),
-                AccountTestHelpers.CreateAccountResponseDto(4, "Closed today", new DateOnly(2026, 1, 1), selectedDate),
-                AccountTestHelpers.CreateAccountResponseDto(
-                    5,
-                    "Closed before",
-                    new DateOnly(2026, 1, 1),
-                    new DateOnly(2026, 6, 14)),
-                AccountTestHelpers.CreateAccountResponseDto(
-                    6,
-                    "Closed after",
-                    new DateOnly(2026, 1, 1),
-                    new DateOnly(2026, 6, 16))
-            ]);
+        SetupAccountsForDate(
+            selectedDate,
+            AccountTestHelpers.CreateAccountResponseDto(1, "Opened today", selectedDate),
+            AccountTestHelpers.CreateAccountResponseDto(2, "Opened before", new DateOnly(2026, 6, 14)),
+            AccountTestHelpers.CreateAccountResponseDto(3, "Future opening", new DateOnly(2026, 6, 16)),
+            AccountTestHelpers.CreateAccountResponseDto(4, "Closed today", new DateOnly(2026, 1, 1), selectedDate),
+            AccountTestHelpers.CreateAccountResponseDto(
+                5,
+                "Closed before",
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 6, 14)),
+            AccountTestHelpers.CreateAccountResponseDto(
+                6,
+                "Closed after",
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 6, 16)));
 
         IReadOnlyList<AccountResponseDTO> result = await _accountService.GetActiveAccountsAsync(selectedDate);
 
@@ -76,17 +74,56 @@ public sealed class AccountServiceTests
     public async Task GetClosedAccountsAsync_WithClosingBoundary_ReturnsOnlyAccountsClosedBySelectedDate()
     {
         var selectedDate = new DateOnly(2026, 6, 15);
-        _accountRepository.Setup(repository => repository.GetAllAsync(selectedDate))
-            .ReturnsAsync(
-            [
-                AccountTestHelpers.CreateAccountResponseDto(1, "No close date"),
-                AccountTestHelpers.CreateAccountResponseDto(2, "Closed today", closedDate: selectedDate),
-                AccountTestHelpers.CreateAccountResponseDto(3, "Closed before", closedDate: new DateOnly(2026, 6, 14)),
-                AccountTestHelpers.CreateAccountResponseDto(4, "Closed after", closedDate: new DateOnly(2026, 6, 16))
-            ]);
+        SetupAccountsForDate(
+            selectedDate,
+            AccountTestHelpers.CreateAccountResponseDto(1, "No close date"),
+            AccountTestHelpers.CreateAccountResponseDto(2, "Closed today", closedDate: selectedDate),
+            AccountTestHelpers.CreateAccountResponseDto(3, "Closed before", closedDate: new DateOnly(2026, 6, 14)),
+            AccountTestHelpers.CreateAccountResponseDto(4, "Closed after", closedDate: new DateOnly(2026, 6, 16)));
 
         IReadOnlyList<AccountResponseDTO> result = await _accountService.GetClosedAccountsAsync(selectedDate);
 
         Assert.Equal([2, 3], result.Select(account => account.Id));
+    }
+
+    [Fact]
+    public async Task IsAccountActive_WhenAccountIsActiveOnSelectedDate_ReturnsTrue()
+    {
+        var selectedDate = new DateOnly(2026, 6, 15);
+        SetupAccountsForDate(
+            selectedDate,
+            AccountTestHelpers.CreateAccountResponseDto(1, "Checking", new DateOnly(2026, 1, 1)),
+            AccountTestHelpers.CreateAccountResponseDto(
+                2,
+                "Closed",
+                new DateOnly(2026, 1, 1),
+                selectedDate));
+
+        var result = await _accountService.IsAccountActive(1, selectedDate);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task IsAccountActive_WhenAccountIsNotActiveOnSelectedDate_ReturnsFalse()
+    {
+        var selectedDate = new DateOnly(2026, 6, 15);
+        SetupAccountsForDate(
+            selectedDate,
+            AccountTestHelpers.CreateAccountResponseDto(
+                1,
+                "Closed",
+                new DateOnly(2026, 1, 1),
+                selectedDate));
+
+        var result = await _accountService.IsAccountActive(1, selectedDate);
+
+        Assert.False(result);
+    }
+
+    private void SetupAccountsForDate(DateOnly selectedDate, params AccountResponseDTO[] accounts)
+    {
+        _accountRepository.Setup(repository => repository.GetAllAsync(selectedDate))
+            .ReturnsAsync(accounts);
     }
 }

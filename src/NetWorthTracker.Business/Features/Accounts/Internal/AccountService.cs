@@ -52,4 +52,11 @@ internal sealed class AccountService : IAccountService
             return Result.Failure(AccountErrors.DuplicateName);
         }
     }
+
+    public async Task<bool> IsAccountActive(int accountId, DateOnly selectedDate)
+    {
+        IReadOnlyList<AccountResponseDTO> activeAccounts = await GetActiveAccountsAsync(selectedDate);
+
+        return activeAccounts.Any(account => account.Id == accountId);
+    }
 }

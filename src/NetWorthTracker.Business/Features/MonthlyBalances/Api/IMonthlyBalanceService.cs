@@ -1,8 +1,10 @@
+using NetWorthTracker.Business.Results;
+
 namespace NetWorthTracker.Business.Features.MonthlyBalances.Api;
 
 public interface IMonthlyBalanceService
 {
-    Task AddMonthlyBalanceAsync(MonthlyBalanceCreateDTO monthlyBalance);
+    Task<Result> AddMonthlyBalanceAsync(MonthlyBalanceCreateDTO monthlyBalanceCreateDto);
 
     Task<decimal?> GetBalanceByDateAsync(int accountId, DateOnly monthDate);
 }
