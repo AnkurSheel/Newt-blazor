@@ -47,13 +47,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            <div class="flex items-center gap-2 min-w-0">
-                                <span
-                                    class="truncate @(item.IsClosedOn(SelectedDate) ? "line-through text-foreground-muted" : "font-medium text-foreground-secondary")"
-                                    title="@item.Name">
-                                    @item.Name
-                                </span>
-                            </div>
+                            <AccountName Account="item" SelectedDate="SelectedDate" />
                         }
                     </Template>
                 </GridColumn>
@@ -63,20 +57,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.Type == AccountType.ASSET)
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-financial-positive bg-financial-positive-background/60 border border-financial-positive-outline/50 rounded-full inline-block">
-                                    Asset
-                                </span>
-                            }
-                            else
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-account-liability bg-account-liability-background/60 border border-account-liability-outline/50 rounded-full inline-block">
-                                    Liability
-                                </span>
-                            }
+                            <AccountTypeBadge Type="item.Type" />
                         }
                     </Template>
                 </GridColumn>

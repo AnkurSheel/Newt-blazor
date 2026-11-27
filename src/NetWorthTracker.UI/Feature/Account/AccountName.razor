@@ -1,0 +1,6 @@
+<div class="flex items-center gap-2 min-w-0">
+    <span class="truncate @(Account.IsClosedOn(SelectedDate) ? "line-through text-foreground-muted" : "font-medium text-foreground-secondary")"
+          title="@Account.Name">
+        @Account.Name
+    </span>
+</div>
