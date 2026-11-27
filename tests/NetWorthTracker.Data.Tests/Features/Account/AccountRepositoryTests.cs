@@ -1,4 +1,7 @@
-﻿using NetWorthTracker.Business.Features.Accounts.Api;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
+
+using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Data.Features.Account;
 using NetWorthTracker.Data.Features.MonthlyBalance;
 using NetWorthTracker.Data.Tests.TestHelpers;
@@ -24,6 +27,38 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _database.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task Database_WhenAccountDateIsNotFirstOfMonth_RejectsAccount()
+    {
+        await using var context = await _database.CreateDbContextAsync();
+
+        await Assert.ThrowsAsync<SqliteException>(() => context.Database.ExecuteSqlRawAsync(
+            "INSERT INTO accounts (Name, Type, OpenDate) VALUES ('Invalid', 1, '2026-06-15')"));
+    }
+
+    [Fact]
+    public async Task AddAsync_WhenOpeningAndClosingAreInSameMonth_RejectsAccount()
+    {
+        var account = AccountTestHelpers.GetAccountCreateDto(
+            openDate: new DateOnly(2026, 6, 5), closedDate: new DateOnly(2026, 6, 25));
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => _repository.AddAsync(account));
+    }
+
+    [Fact]
+    public async Task AddAsync_WithMidMonthDates_PersistsFirstOfEachMonth()
+    {
+        var account = AccountTestHelpers.GetAccountCreateDto(
+            openDate: new DateOnly(2025, 1, 15), closedDate: new DateOnly(2026, 6, 27));
+
+        await _repository.AddAsync(account);
+
+        var saved = Assert.Single(await _repository.GetAllAsync(queryDate));
+        Assert.Multiple(
+            () => Assert.Equal(new DateOnly(2025, 1, 1), saved.OpenDate),
+            () => Assert.Equal(new DateOnly(2026, 6, 1), saved.ClosedDate));
     }
 
     [Fact]
@@ -83,7 +118,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     public async Task GetAllAsync_MapsAllAccountPropertiesCorrectly()
     {
         var openDate = new DateOnly(2024, 6, 1);
-        var closedDate = new DateOnly(2026, 12, 31);
+        var closedDate = new DateOnly(2026, 12, 1);
         var queryDate = new DateOnly(2025, 1, 1);
 
         var accountId = await AccountTestHelpers.AddAccount(
