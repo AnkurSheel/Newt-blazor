@@ -18,6 +18,19 @@ public sealed class AccountServiceTests
     }
 
     [Fact]
+    public async Task AddAccountAsync_WhenClosingMonthIsNotAfterOpeningMonth_ReturnsInvalidDates()
+    {
+        var account = new AccountCreateDTO(
+            "Checking", AccountType.ASSET, new DateOnly(2026, 6, 5), new DateOnly(2026, 6, 25));
+
+        var result = await _accountService.AddAccountAsync(account);
+
+        Assert.Multiple(
+            () => Assert.Equal("Accounts.InvalidDates", result.Error.Code),
+            () => _accountRepository.Verify(repository => repository.AddAsync(It.IsAny<AccountCreateDTO>()), Times.Never));
+    }
+
+    [Fact]
     public async Task AddAccountAsync_WhenNameIsBlank_ReturnsInvalidNameWithoutPersisting()
     {
         var account = new AccountCreateDTO(" ", AccountType.ASSET, new DateOnly(2025, 1, 1), null);

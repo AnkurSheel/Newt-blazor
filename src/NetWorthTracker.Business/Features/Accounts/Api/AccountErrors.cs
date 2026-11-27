@@ -7,4 +7,7 @@ public static class AccountErrors
     public static Error DuplicateName { get; } = new("Accounts.DuplicateName", "This account has already been added.");
 
     public static Error InvalidName { get; } = new("Accounts.InvalidName", "Account name is required.");
+
+    public static Error InvalidDates { get; } =
+        new("Accounts.InvalidDates", "The closing month must be after the opening month.");
 }

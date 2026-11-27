@@ -36,9 +36,10 @@ internal sealed class AccountService : IAccountService
 
     public async Task<Result> AddAccountAsync(AccountCreateDTO account)
     {
-        if (string.IsNullOrWhiteSpace(account.Name))
+        var validationError = ValidateAccount(account);
+        if (validationError is not null)
         {
-            return Result.Failure(AccountErrors.InvalidName);
+            return Result.Failure(validationError);
         }
 
         try
@@ -58,5 +59,33 @@ internal sealed class AccountService : IAccountService
         AccountResponseDTO? account = await _repository.GetByIdAsync(accountId, selectedDate);
 
         return account?.IsActive(selectedDate) ?? false;
+    }
+
+    private static Error? ValidateAccount(AccountCreateDTO account)
+    {
+        if (string.IsNullOrWhiteSpace(account.Name))
+        {
+            return AccountErrors.InvalidName;
+        }
+
+        if (!IsClosingMonthAfterOpenMonth(account))
+        {
+            return AccountErrors.InvalidDates;
+        }
+
+        return null;
+    }
+
+    private static bool IsClosingMonthAfterOpenMonth(AccountCreateDTO account)
+    {
+        if (!account.ClosedDate.HasValue)
+        {
+            return true;
+        }
+
+        var openingMonth = new DateOnly(account.OpenDate.Year, account.OpenDate.Month, 1);
+        var closingDate = account.ClosedDate.Value;
+        var closingMonth = new DateOnly(closingDate.Year, closingDate.Month, 1);
+        return closingMonth > openingMonth;
     }
 }
