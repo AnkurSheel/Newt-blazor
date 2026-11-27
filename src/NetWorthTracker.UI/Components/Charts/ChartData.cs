@@ -2,7 +2,7 @@
 
 public class ChartData
 {
-    public ChartData(DateOnly period, float value)
+    public ChartData(DateOnly period, double value)
     {
         Period = period;
         Value = value;
