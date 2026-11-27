@@ -1,7 +1,8 @@
 ﻿@page "/accounts"
 @using NetWorthTracker.Business.Features.Accounts.Api
 
-<div>
+<PageHeader Title="Accounts"/>
+<div class="p-4 sm:p-8">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
         <!-- Left Group: Filter Tabs & Count Badge -->
         <div class="flex items-center gap-3 flex-wrap">
@@ -47,7 +48,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            <AccountName Account="item" SelectedDate="SelectedDate" />
+                            <AccountName Account="item" SelectedDate="_currentMonth" />
                         }
                     </Template>
                 </GridColumn>
@@ -81,14 +82,14 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.OpenDate > SelectedDate)
+                            if (item.OpenDate > _currentMonth)
                             {
                                 <span
                                     class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">
                                     Not yet open
                                 </span>
                             }
-                            else if (item.IsClosedOn(SelectedDate))
+                            else if (item.IsClosedOn(_currentMonth))
                             {
                                 <span
                                     class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">

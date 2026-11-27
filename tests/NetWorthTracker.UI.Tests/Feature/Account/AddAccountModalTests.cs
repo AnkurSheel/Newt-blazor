@@ -26,6 +26,19 @@ public sealed class AddAccountModalTests : BunitContext
     }
 
     [Fact]
+    public async Task Save_WhenClosingMonthIsInvalid_ShowsErrorWithDateFields()
+    {
+        SetupAccountServiceError("Checking", AccountErrors.InvalidDates);
+        IRenderedComponent<AddAccountModal> modal = RenderModal();
+        await GetAccountNameInput(modal, "Checking");
+
+        await PressSaveButton(modal);
+
+        var dateSection = modal.Find("input[type='checkbox']").Closest("div");
+        Assert.Contains(AccountErrors.InvalidDates.Message, dateSection!.TextContent);
+    }
+
+    [Fact]
     public async Task Save_WhenAccountNameAlreadyExists_ShowsError()
     {
         SetupAccountServiceError("Checking", AccountErrors.DuplicateName);

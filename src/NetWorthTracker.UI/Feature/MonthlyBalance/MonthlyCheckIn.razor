@@ -4,7 +4,13 @@
 
 @inject IAccountService AccountService
 
-<div>
+<PageHeader Title="Dashboard">
+    <MonthNavigation/>
+</PageHeader>
+<div class="p-4 sm:p-8 space-y-6">
+    <AppErrorBoundary>
+        <FinancialSummaryContainer/>
+    </AppErrorBoundary>
     @if (!Accounts.Any())
     {
         <section class="rounded-xl border border-outline bg-background-panel p-6 text-center">

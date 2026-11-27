@@ -1,0 +1,19 @@
+<div class="flex items-center gap-1.5 sm:gap-2">
+    <button type="button"
+            @onclick="() => SelectMonth.InvokeAsync(SelectedDate.AddMonths(-1))"
+            aria-label="Previous month"
+            title="Previous month"
+            class="p-1.5 rounded-lg text-foreground-muted hover:text-foreground-inverse hover:bg-background-interactive border border-outline/80 hover:border-outline-strong/50 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-accent flex items-center justify-center">
+        <ChevronLeftIcon/>
+    </button>
+    <div class="w-48 sm:w-56">
+        <MonthYearPicker Value="@SelectedDate" NonNullableValueChanged="SelectMonth" Label=""/>
+    </div>
+    <button type="button"
+            @onclick="() => SelectMonth.InvokeAsync(SelectedDate.AddMonths(1))"
+            aria-label="Next month"
+            title="Next month"
+            class="p-1.5 rounded-lg text-foreground-muted hover:text-foreground-inverse hover:bg-background-interactive border border-outline/80 hover:border-outline-strong/50 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-accent flex items-center justify-center">
+        <ChevronRightIcon/>
+    </button>
+</div>

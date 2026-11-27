@@ -15,18 +15,36 @@ namespace NetWorthTracker.UI.Tests.Feature.Account;
 public sealed class AccountListTests : BunitContext
 {
     private readonly Mock<IAccountService> _accountService = new();
+    private readonly Mock<TimeProvider> _clock = new();
     private readonly DateOnly _selectedDate = new(2026, 6, 1);
 
     public AccountListTests()
     {
         ServiceRegistry.ConfigureServices(Services);
         Services.AddSingleton(_accountService.Object);
+        _clock.Setup(provider => provider.GetUtcNow()).Returns(new DateTimeOffset(2026, 6, 15, 0, 0, 0, TimeSpan.Zero));
+        _clock.Setup(provider => provider.LocalTimeZone).Returns(TimeZoneInfo.Utc);
+        Services.AddSingleton(_clock.Object);
         SetRendererInfo(new RendererInfo("WebView", true));
         JSInterop.Mode = JSRuntimeMode.Loose;
     }
 
     [Fact]
-    public async Task InitialLoad_DisplaysActiveAccountsForSelectedDate()
+    public async Task InitialLoad_WhenLocalMonthDiffersFromUtc_UsesLocalMonth()
+    {
+        _clock.Setup(provider => provider.GetUtcNow()).Returns(new DateTimeOffset(2026, 5, 31, 23, 0, 0, TimeSpan.Zero));
+        _clock.Setup(provider => provider.LocalTimeZone)
+            .Returns(TimeZoneInfo.CreateCustomTimeZone("Test", TimeSpan.FromHours(2), "Test", "Test"));
+        _accountService.Setup(service => service.GetActiveAccountsAsync(new DateOnly(2026, 6, 1)))
+            .ReturnsAsync([AccountTestHelpers.CreateAccountResponseDto(name: "June account")]);
+
+        var cut = RenderList(new DateOnly(2026, 5, 1));
+
+        await cut.WaitForAssertionAsync(() => Assert.Contains("June account", cut.Markup));
+    }
+
+    [Fact]
+    public async Task InitialLoad_DisplaysActiveAccountsForCurrentMonth()
     {
         AccountTestHelpers.SetupActiveAccountService(
             _accountService,
@@ -86,32 +104,26 @@ public sealed class AccountListTests : BunitContext
     }
 
     [Fact]
-    public async Task SelectedDateChanges_ReloadsActiveAccountsForNewDate()
+    public async Task AllFilter_UsesCurrentLocalMonthForAccountStatuses()
     {
-        var firstDate = new DateOnly(2026, 5, 1);
-        var secondDate = new DateOnly(2026, 6, 1);
-
-        _accountService.Setup(service => service.GetActiveAccountsAsync(firstDate))
+        AccountTestHelpers.SetupActiveAccountService(_accountService, []);
+        _accountService.Setup(service => service.GetAccountsAsync(new DateOnly(2026, 6, 1)))
             .ReturnsAsync(
             [
-                AccountTestHelpers.CreateAccountResponseDto(name: "May Active", openDate: new DateOnly(2026, 1, 1))
+                AccountTestHelpers.CreateAccountResponseDto(1, "Open", new DateOnly(2026, 6, 1)),
+                AccountTestHelpers.CreateAccountResponseDto(
+                    2, "Closed", new DateOnly(2026, 1, 1), new DateOnly(2026, 6, 1)),
+                AccountTestHelpers.CreateAccountResponseDto(3, "Future", new DateOnly(2026, 7, 1))
             ]);
-        _accountService.Setup(service => service.GetActiveAccountsAsync(secondDate))
-            .ReturnsAsync(
-            [
-                AccountTestHelpers.CreateAccountResponseDto(name: "June Active", openDate: new DateOnly(2026, 1, 1))
-            ]);
+        IRenderedComponent<CascadingValue<DateOnly>> cut = RenderList(new DateOnly(2026, 1, 1));
 
-        IRenderedComponent<CascadingValue<DateOnly>> cut = RenderList(firstDate);
-        await cut.WaitForAssertionAsync(() => Assert.Contains("May Active", cut.Markup));
-
-        cut.Render(parameters => parameters.Add(component => component.Value, secondDate)
-            .AddChildContent<AccountList>());
+        await cut.GetByRole("button", "All").ClickAsync();
 
         await cut.WaitForAssertionAsync(() =>
         {
-            Assert.Contains("June Active", cut.Markup);
-            Assert.DoesNotContain("May Active", cut.Markup);
+            Assert.Contains("Closed Jun, 2026", cut.Markup);
+            Assert.Contains("Not yet open", cut.Markup);
+            Assert.Contains("Active", cut.Find("span[title='Open']").Closest("tr")!.TextContent);
         });
     }
 

@@ -48,7 +48,8 @@
                             }
                         </div>
 
-                        <MonthYearPicker Label="Open Date" @bind-Value="@_openDate"/>
+                        <MonthYearPicker Label="Open Date" @bind-Value="@_openDate"
+                                         @bind-Value:after="ClearAccountDateError"/>
 
                         <!-- Mark as Closed Toggle Option Layout Panel -->
                         <div class="pt-2 border-t border-outline">
@@ -62,7 +63,12 @@
 
                             @if (_isAccountClosed)
                             {
-                                <MonthYearPicker Label="Closed Date" @bind-Value="@_closedDate"/>
+                                <MonthYearPicker Label="Closed Date" @bind-Value="@_closedDate"
+                                                 @bind-Value:after="ClearAccountDateError"/>
+                            }
+                            @if (_accountDateError is not null)
+                            {
+                                <p role="alert" class="mt-1 text-sm text-feedback-error">@_accountDateError</p>
                             }
                         </div>
 

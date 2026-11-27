@@ -8,6 +8,7 @@ using Moq;
 using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.TestHelpers;
+using NetWorthTracker.UI.Components;
 using NetWorthTracker.UI.Feature.MonthlyBalance;
 using NetWorthTracker.UI.Tests.TestHelpers;
 
@@ -23,6 +24,7 @@ public sealed class MonthlyCheckInTests : BunitContext
         ServiceRegistry.ConfigureServices(Services);
         Services.AddSingleton(_accountService.Object);
         Services.AddSingleton(Mock.Of<IMonthlyBalanceService>());
+        ComponentFactories.AddStub<FinancialSummaryContainer>();
         SetRendererInfo(new RendererInfo("WebView", true));
         JSInterop.Mode = JSRuntimeMode.Loose;
     }

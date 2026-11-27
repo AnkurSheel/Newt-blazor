@@ -1,51 +1,16 @@
-﻿
 @inherits LayoutComponentBase
 
 <div class="flex min-h-screen w-full bg-background-page text-foreground e-dark-mode">
     <NavMenu/>
     <div class="flex-1 min-w-0">
-
-        <header
-            class="h-16 border-b border-outline px-4 sm:px-8 flex items-center justify-between bg-background-page/80 backdrop-blur sticky top-0 z-10">
-            <h1 class="text-lg sm:text-xl font-semibold tracking-wide text-foreground-inverse truncate">Dashboard</h1>
-
-            <div class="flex items-center gap-1.5 sm:gap-2">
-                <button type="button"
-                        @onclick="NavigatePreviousMonth"
-                        aria-label="Previous month"
-                        title="Previous month"
-                        class="p-1.5 rounded-lg text-foreground-muted hover:text-foreground-inverse hover:bg-background-interactive border border-outline/80 hover:border-outline-strong/50 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-accent flex items-center justify-center">
-                    <ChevronLeftIcon/>
-                </button>
-
-                <!-- Custom Syncfusion Month/Year Picker -->
-                <div class="w-48 sm:w-56">
-                    <MonthYearPicker Value="@_selectedDate"
-                                     NonNullableValueChanged="OnDateChanged"
-                                     Label=""/>
-                </div>
-
-                <button type="button"
-                        @onclick="NavigateNextMonth"
-                        aria-label="Next month"
-                        title="Next month"
-                        class="p-1.5 rounded-lg text-foreground-muted hover:text-foreground-inverse hover:bg-background-interactive border border-outline/80 hover:border-outline-strong/50 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-accent flex items-center justify-center">
-                    <ChevronRightIcon/>
-                </button>
-            </div>
-        </header>
-
         <CascadingValue Value="@_selectedDate">
-            <div class="min-h-screen w-full flex flex-col bg-background-page text-foreground font-sans">
-                <main class="flex-1 p-4 sm:p-8 overflow-x-hidden space-y-6">
-                    <AppErrorBoundary>
-                        <FinancialSummaryContainer/>
-                    </AppErrorBoundary>
+            <CascadingValue Name="SelectMonth" Value="@_selectMonth">
+                <main class="min-h-screen w-full bg-background-page text-foreground font-sans">
                     <AppErrorBoundary>
                         @Body
                     </AppErrorBoundary>
                 </main>
-            </div>
+            </CascadingValue>
         </CascadingValue>
     </div>
 </div>
