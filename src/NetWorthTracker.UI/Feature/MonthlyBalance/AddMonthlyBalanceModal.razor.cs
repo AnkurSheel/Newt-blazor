@@ -8,6 +8,8 @@ public partial class AddMonthlyBalanceModal
 {
     private decimal _balance;
     private DateOnly? _transactionDate;
+    private string? _errorMessage;
+    private bool _isSaving;
 
     [Parameter]
     public bool IsVisible { get; set; }
@@ -62,22 +64,47 @@ public partial class AddMonthlyBalanceModal
         }
     }
 
+    private void ClearError()
+    {
+        _errorMessage = null;
+    }
+
     private async Task SaveMonthlyBalance()
     {
+        if (_isSaving)
+        {
+            return;
+        }
+
         if (_transactionDate == null)
         {
             return;
         }
 
-        await MonthlyBalanceService.AddMonthlyBalanceAsync(
-            new MonthlyBalanceCreateDTO(AccountId, _transactionDate.Value, _balance));
+        _isSaving = true;
+        _errorMessage = null;
+        try
+        {
+            var result = await MonthlyBalanceService.AddMonthlyBalanceAsync(
+                new MonthlyBalanceCreateDTO(AccountId, _transactionDate.Value, _balance));
+            if (result.IsFailure)
+            {
+                _errorMessage = result.Error.Message;
+                return;
+            }
 
-        await OnTransactionSaved.InvokeAsync();
-        await CloseModal();
+            await OnTransactionSaved.InvokeAsync();
+            await CloseModal();
+        }
+        finally
+        {
+            _isSaving = false;
+        }
     }
 
     private async Task CloseModal()
     {
+        _errorMessage = null;
         IsVisible = false;
         await IsVisibleChanged.InvokeAsync(false);
     }

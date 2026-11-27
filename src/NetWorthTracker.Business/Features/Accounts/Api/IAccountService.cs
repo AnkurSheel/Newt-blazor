@@ -11,4 +11,6 @@ public interface IAccountService
     Task<IReadOnlyList<AccountResponseDTO>> GetClosedAccountsAsync(DateOnly selectedDate);
 
     Task<Result> AddAccountAsync(AccountCreateDTO account);
+
+    Task<bool> IsAccountActive(int accountId, DateOnly selectedDate);
 }

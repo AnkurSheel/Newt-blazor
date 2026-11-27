@@ -1,20 +1,28 @@
 ﻿@page "/dashboard"
 @using Syncfusion.Blazor.Charts
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <Trends Title="Year-Over-Year (YoY) Net Worth Trends"
-            PercentChangeData="GetYoyPercentChangeData()"
-            AbsoluteChangeData="GetYoyAbsoluteChangeData()"
-            CumulativeData="GetYoyCumulativeData()"
-            IntervalType="IntervalType.Years"
-            LabelFormat="yyyy"
-            ShowMarkers="true">
-    </Trends>
-    <Trends Title="Month-Over-Month (MoM) Net Worth Trends"
-            PercentChangeData="GetMomPercentChangeData()"
-            AbsoluteChangeData="GetMomAbsoluteChangeData()"
-            CumulativeData="GetMomCumulativeData()"
-            IntervalType="IntervalType.Auto"
-            LabelFormat="MMM yyyy">
-    </Trends>
+<PageHeader Title="Dashboard">
+    <MonthNavigation/>
+</PageHeader>
+<div class="p-4 sm:p-8 space-y-6">
+    <AppErrorBoundary>
+        <FinancialSummaryContainer/>
+    </AppErrorBoundary>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Trends Title="Year-Over-Year (YoY) Net Worth Trends"
+                PercentChangeData="_yearlyTrendData.PercentChange"
+                AbsoluteChangeData="_yearlyTrendData.AbsoluteChange"
+                CumulativeData="_yearlyTrendData.Cumulative"
+                IntervalType="IntervalType.Years"
+                LabelFormat="yyyy"
+                ShowMarkers="true">
+        </Trends>
+        <Trends Title="Month-Over-Month (MoM) Net Worth Trends"
+                PercentChangeData="_monthlyTrendData.PercentChange"
+                AbsoluteChangeData="_monthlyTrendData.AbsoluteChange"
+                CumulativeData="_monthlyTrendData.Cumulative"
+                IntervalType="IntervalType.Auto"
+                LabelFormat="MMM yyyy">
+        </Trends>
+    </div>
 </div>

@@ -6,5 +6,7 @@ public interface IAccountRepository
 {
     Task<IReadOnlyList<AccountResponseDTO>> GetAllAsync(DateOnly selectedDate);
 
+    Task<AccountResponseDTO?> GetByIdAsync(int accountId, DateOnly selectedDate);
+
     Task AddAsync(AccountCreateDTO account);
 }

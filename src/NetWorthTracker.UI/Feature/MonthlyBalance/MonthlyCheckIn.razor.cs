@@ -19,7 +19,7 @@ public partial class MonthlyCheckIn
 
     private void OpenAddTransactionModal(AccountResponseDTO account)
     {
-        if (account.IsClosedOn(SelectedDate) || account.BalanceOnDate.HasValue)
+        if (account.BalanceOnDate.HasValue)
         {
             return;
         }

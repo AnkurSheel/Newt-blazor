@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The Accounts page now shows account status for the current month and no longer displays the dashboard's month selector or summary cards.
+
+### Fixed
+
+- Account creation now explains when the closing month is not after the opening month.
+- Adding a monthly balance now shows an error when the account is inactive or a balance already exists for that month.
+- Improved the precision of large values in net worth trend charts.
+
 ## [0.2.0.0] - 2026-11-25
 
 ### Changed

@@ -23,7 +23,9 @@
                 </div>
 
                 <!-- Month Picker (Restricted to max = current month) -->
-                <MonthYearPicker Label="Transaction Date" @bind-Value="_transactionDate"></MonthYearPicker>
+                <MonthYearPicker Label="Transaction Date"
+                                 @bind-Value="_transactionDate"
+                                 @bind-Value:after="ClearError"></MonthYearPicker>
 
                 <!-- Balance Input -->
                 <div>
@@ -39,6 +41,10 @@
                     </div>
                     <input type="number" step="0.01" @bind="_balance"
                            class="w-full bg-background-panel border border-outline text-foreground font-mono rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-primary-hover"/>
+                    @if (_errorMessage is not null)
+                    {
+                        <p role="alert" class="mt-1 text-sm text-feedback-error">@_errorMessage</p>
+                    }
                 </div>
             </div>
 
@@ -49,6 +55,7 @@
                     Cancel
                 </button>
                 <button @onclick="SaveMonthlyBalance"
+                        disabled="@_isSaving"
                         class="px-4 py-2 bg-brand-primary hover:bg-brand-primary-hover text-foreground-inverse font-medium text-xs rounded-lg shadow transition">
                     Save Transaction
                 </button>

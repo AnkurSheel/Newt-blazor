@@ -1,9 +1,16 @@
 ﻿@page "/monthly-check-in"
 @using NetWorthTracker.Business.Features.Accounts.Api
+@using NetWorthTracker.UI.Feature.Account
 
 @inject IAccountService AccountService
 
-<div>
+<PageHeader Title="Dashboard">
+    <MonthNavigation/>
+</PageHeader>
+<div class="p-4 sm:p-8 space-y-6">
+    <AppErrorBoundary>
+        <FinancialSummaryContainer/>
+    </AppErrorBoundary>
     @if (!Accounts.Any())
     {
         <section class="rounded-xl border border-outline bg-background-panel p-6 text-center">
@@ -24,13 +31,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            <div class="flex items-center gap-2 min-w-0">
-                                <span
-                                    class="truncate @(item.IsClosedOn(SelectedDate) ? "line-through text-foreground-muted" : "font-medium text-foreground-secondary")"
-                                    title="@item.Name">
-                                    @item.Name
-                                </span>
-                            </div>
+                            <AccountName Account="item" SelectedDate="SelectedDate" />
                         }
                     </Template>
                 </GridColumn>
@@ -40,20 +41,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.Type == AccountType.ASSET)
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-financial-positive bg-financial-positive-background/60 border border-financial-positive-outline/50 rounded-full inline-block">
-                                    Asset
-                                </span>
-                            }
-                            else
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-account-liability bg-account-liability-background/60 border border-account-liability-outline/50 rounded-full inline-block">
-                                    Liability
-                                </span>
-                            }
+                            <AccountTypeBadge Type="item.Type" />
                         }
                     </Template>
                 </GridColumn>
@@ -83,19 +71,12 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (!item.IsClosedOn(SelectedDate))
-                            {
-                                <button @onclick="() => OpenAddTransactionModal(item)"
-                                        disabled="@item.BalanceOnDate.HasValue"
-                                        title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
-                                        class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
-                                    <span>+ Txn</span>
-                                </button>
-                            }
-                            else
-                            {
-                                <span class="text-xs text-foreground-muted font-medium italic">Closed</span>
-                            }
+                            <button @onclick="() => OpenAddTransactionModal(item)"
+                                    disabled="@item.BalanceOnDate.HasValue"
+                                    title="@(item.BalanceOnDate.HasValue ? $"Transaction already recorded for {SelectedDate:MMM yyyy}" : "Add transaction")"
+                                    class="px-2.5 py-1 text-xs font-medium rounded-md transition inline-flex items-center gap-1 text-brand-accent bg-brand-background/60 border border-brand-outline/50 hover:bg-brand-background-hover/80 cursor-pointer disabled:bg-background-page disabled:border-outline disabled:text-foreground-disabled disabled:cursor-not-allowed disabled:opacity-50">
+                                <span>+ Txn</span>
+                            </button>
                         }
                     </Template>
                 </GridColumn>

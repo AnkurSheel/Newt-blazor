@@ -28,6 +28,9 @@ public class AccountConfiguration : IEntityTypeConfiguration<AccountEntity>
             t.HasCheckConstraint("CK_Account_Name_Length", "length([Name]) <= 256");
             t.HasCheckConstraint("CK_Account_Type_Values", $"[Type] IN ({sqlInClauseValues})");
             t.HasCheckConstraint("CK_Account_Dates", "[ClosedDate] IS NULL OR [ClosedDate] > [OpenDate]");
+            t.HasCheckConstraint(
+                "CK_Account_MonthDates",
+                "substr([OpenDate], 9, 2) = '01' AND ([ClosedDate] IS NULL OR substr([ClosedDate], 9, 2) = '01')");
         });
     }
 }

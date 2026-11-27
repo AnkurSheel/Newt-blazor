@@ -6,7 +6,7 @@ namespace NetWorthTracker.UI.Feature.Account;
 
 public partial class AddAccountModal
 {
-    [Parameter] 
+    [Parameter]
     public bool IsVisible { get; set; }
 
     [Parameter]
@@ -22,6 +22,7 @@ public partial class AddAccountModal
     private DateOnly? _closedDate;
     private DateOnly? _openDate = DateOnly.FromDateTime(DateTime.Now);
     private string? _accountNameError;
+    private string? _accountDateError;
     private bool _isSaving;
 
     private async Task OnVisibleChanged(bool value)
@@ -29,6 +30,7 @@ public partial class AddAccountModal
         if (!value)
         {
             ClearAccountNameError();
+            ClearAccountDateError();
         }
 
         IsVisible = value;
@@ -43,6 +45,7 @@ public partial class AddAccountModal
 
     private void ToggleClosedState(ChangeEventArgs e)
     {
+        ClearAccountDateError();
         _isAccountClosed = (bool)(e.Value ?? false);
         if (!_isAccountClosed)
         {
@@ -59,6 +62,7 @@ public partial class AddAccountModal
 
         _isSaving = true;
         ClearAccountNameError();
+        ClearAccountDateError();
         var submittedName = _newAccountName;
         try
         {
@@ -71,7 +75,14 @@ public partial class AddAccountModal
                 {
                     if (IsVisible && _newAccountName == submittedName)
                     {
-                        _accountNameError = result.Error.Message;
+                        if (result.Error == AccountErrors.InvalidDates)
+                        {
+                            _accountDateError = result.Error.Message;
+                        }
+                        else
+                        {
+                            _accountNameError = result.Error.Message;
+                        }
                     }
 
                     return;
@@ -90,6 +101,11 @@ public partial class AddAccountModal
     private void ClearAccountNameError()
     {
         _accountNameError = null;
+    }
+
+    private void ClearAccountDateError()
+    {
+        _accountDateError = null;
     }
 
     private void ResetForm()

@@ -1,0 +1,14 @@
+@using NetWorthTracker.Business.Features.Accounts.Api
+
+@if (Type == AccountType.ASSET)
+{
+    <span class="px-2.5 py-1 text-xs font-semibold text-financial-positive bg-financial-positive-background/60 border border-financial-positive-outline/50 rounded-full inline-block">
+        Asset
+    </span>
+}
+else
+{
+    <span class="px-2.5 py-1 text-xs font-semibold text-account-liability bg-account-liability-background/60 border border-account-liability-outline/50 rounded-full inline-block">
+        Liability
+    </span>
+}

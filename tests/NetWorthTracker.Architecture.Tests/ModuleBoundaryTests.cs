@@ -48,7 +48,7 @@ namespace NetWorthTracker.Architecture.Tests
             };
 
         [Fact]
-        public void ProjectReferences_FollowThePermittedDependencyGraph()
+        public void Projects_follow_the_permitted_dependency_graph()
         {
             var repositoryRoot = FindRepositoryRoot();
             var sourceProjects = Directory.EnumerateFiles(
@@ -73,15 +73,16 @@ namespace NetWorthTracker.Architecture.Tests
                     => $"{entry.Project}: expected [{string.Join(", ", entry.Expected)}], found [{string.Join(", ", entry.Actual)}]")
                 .ToArray();
 
-            Assert.Equal(
-                AllowedProjectReferences.Keys.Order()
-                    .ToArray(),
-                sourceProjects);
-            Assert.Empty(mismatches);
+            Assert.Multiple(
+                () => Assert.Equal(
+                    AllowedProjectReferences.Keys.Order()
+                        .ToArray(),
+                    sourceProjects),
+                () => Assert.Empty(mismatches));
         }
 
         [Fact]
-        public void BusinessProject_HasNoUiMauiEfOrConcretePersistenceDependency()
+        public void Business_project_has_no_ui_maui_ef_or_concrete_persistence_dependencies()
         {
             var projectPath = Path.Combine(
                 FindRepositoryRoot(),
@@ -103,22 +104,20 @@ namespace NetWorthTracker.Architecture.Tests
             Assert.Empty(forbiddenReferences);
         }
 
-        [Fact]
-        public void BusinessAssembly_HasNoCrossModuleTypeReferencesToInternalOrPersistence()
+        [Theory]
+        [MemberData(nameof(FeatureModules))]
+        public void Business_modules_cannot_reference_other_modules_internals_or_persistence(string module)
         {
-            foreach (var module in GetFeatureModules())
-            {
-                CreateModuleBoundaryRule(
-                        module,
-                        Types()
-                            .That()
-                            .ResideInAssembly(BusinessAssembly))
-                    .Check(Architecture);
-            }
+            CreateModuleBoundaryRule(
+                    module,
+                    Types()
+                        .That()
+                        .ResideInAssembly(BusinessAssembly))
+                .Check(Architecture);
         }
 
         [Fact]
-        public void ArchUnitRule_AllowsAnotherModulesPublicApi()
+        public void Another_modules_public_api_can_be_referenced()
         {
             var rule = CreateFixtureBoundaryRule(nameof(AccountApiConsumer));
 
@@ -126,24 +125,25 @@ namespace NetWorthTracker.Architecture.Tests
         }
 
         [Fact]
-        public void ArchUnitRule_ExcludesSameModuleDependencies()
+        public void Same_module_dependencies_are_allowed()
         {
             var sourceTypes = Types()
                 .That()
                 .ResideInAssembly(TestAssembly)
                 .And()
                 .HaveNameMatching($"^({nameof(AccountSameModuleConsumer)}|{nameof(AccountApiConsumer)})$");
-            Assert.Equal(
-                2,
-                sourceTypes.GetObjects(Architecture)
-                    .Count());
             var rule = CreateModuleBoundaryRule("Accounts", sourceTypes);
 
-            Assert.True(rule.HasNoViolations(Architecture));
+            Assert.Multiple(
+                () => Assert.Equal(
+                    2,
+                    sourceTypes.GetObjects(Architecture)
+                        .Count()),
+                () => Assert.True(rule.HasNoViolations(Architecture)));
         }
 
         [Fact]
-        public void ArchUnitRule_RejectsAnotherModulesInternalImplementation()
+        public void Another_modules_internal_implementation_cannot_be_referenced()
         {
             var rule = CreateFixtureBoundaryRule(nameof(AccountInternalConsumer));
 
@@ -151,7 +151,7 @@ namespace NetWorthTracker.Architecture.Tests
         }
 
         [Fact]
-        public void ArchUnitRule_RejectsAnotherModulesPersistencePort()
+        public void Another_modules_persistence_port_cannot_be_referenced()
         {
             var rule = CreateFixtureBoundaryRule(nameof(AccountPersistenceConsumer));
 
@@ -159,7 +159,7 @@ namespace NetWorthTracker.Architecture.Tests
         }
 
         [Fact]
-        public void ArchUnitRule_RejectsMethodBodyReferenceToAnotherModulesInternalImplementation()
+        public void Method_body_references_to_another_modules_internal_implementation_are_rejected()
         {
             var rule = CreateFixtureBoundaryRule(nameof(MethodBodyAccountInternalConsumer));
 
@@ -211,6 +211,9 @@ namespace NetWorthTracker.Architecture.Tests
                 .Order(StringComparer.Ordinal)
                 .ToArray();
         }
+
+        public static IEnumerable<object[]> FeatureModules => GetFeatureModules()
+            .Select(module => new object[] { module });
 
         private static string[] ReadProjectReferences(string repositoryRoot, string projectName)
         {

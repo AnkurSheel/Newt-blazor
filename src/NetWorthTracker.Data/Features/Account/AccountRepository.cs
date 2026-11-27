@@ -22,21 +22,20 @@ public class AccountRepository : IAccountRepository
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        return await dbContext.Accounts.AsNoTracking()
-            .OrderBy(x => x.Id)
-            .Select(accountEntity => new AccountResponseDTO
-            {
-                Id = accountEntity.Id,
-                Name = accountEntity.Name,
-                Type = accountEntity.Type,
-                OpenDate = accountEntity.OpenDate,
-                ClosedDate = accountEntity.ClosedDate,
-                BalanceOnDate = dbContext.MonthlyBalances.Where(mb
-                        => mb.AccountId == accountEntity.Id && mb.MonthDate == selectedDate)
-                    .Select(mb => (decimal?)mb.Amount)
-                    .FirstOrDefault()
-            })
+        return await GetAccountResponseQuery(dbContext, dbContext.Accounts.AsNoTracking(), selectedDate)
+            .OrderBy(account => account.Id)
             .ToListAsync();
+    }
+
+    public async Task<AccountResponseDTO?> GetByIdAsync(int accountId, DateOnly selectedDate)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+        return await GetAccountResponseQuery(
+                dbContext,
+                dbContext.Accounts.AsNoTracking().Where(account => account.Id == accountId),
+                selectedDate)
+            .FirstOrDefaultAsync();
     }
 
     public async Task AddAsync(AccountCreateDTO account)
@@ -63,5 +62,24 @@ public class AccountRepository : IAccountRepository
         {
             throw new DuplicateAccountException(ex);
         }
+    }
+
+    private static IQueryable<AccountResponseDTO> GetAccountResponseQuery(
+        AppDbContext dbContext,
+        IQueryable<AccountEntity> accounts,
+        DateOnly selectedDate)
+    {
+        return accounts.Select(accountEntity => new AccountResponseDTO
+        {
+            Id = accountEntity.Id,
+            Name = accountEntity.Name,
+            Type = accountEntity.Type,
+            OpenDate = accountEntity.OpenDate,
+            ClosedDate = accountEntity.ClosedDate,
+            BalanceOnDate = dbContext.MonthlyBalances.Where(monthlyBalance
+                    => monthlyBalance.AccountId == accountEntity.Id && monthlyBalance.MonthDate == selectedDate)
+                .Select(monthlyBalance => (decimal?)monthlyBalance.Amount)
+                .FirstOrDefault()
+        });
     }
 }

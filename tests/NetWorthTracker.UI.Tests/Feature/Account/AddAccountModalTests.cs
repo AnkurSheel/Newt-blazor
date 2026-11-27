@@ -26,7 +26,20 @@ public sealed class AddAccountModalTests : BunitContext
     }
 
     [Fact]
-    public async Task Save_WhenAccountNameAlreadyExists_ShowsError()
+    public async Task Date_error_is_shown_by_date_fields_when_closing_month_is_invalid()
+    {
+        SetupAccountServiceError("Checking", AccountErrors.InvalidDates);
+        IRenderedComponent<AddAccountModal> modal = RenderModal();
+        await GetAccountNameInput(modal, "Checking");
+
+        await PressSaveButton(modal);
+
+        var dateSection = modal.Find("input[type='checkbox']").Closest("div");
+        Assert.Contains(AccountErrors.InvalidDates.Message, dateSection!.TextContent);
+    }
+
+    [Fact]
+    public async Task Duplicate_name_error_is_shown_and_dialog_stays_open()
     {
         SetupAccountServiceError("Checking", AccountErrors.DuplicateName);
 
@@ -38,13 +51,14 @@ public sealed class AddAccountModalTests : BunitContext
         await PressSaveButton(modal);
 
         var error = modal.GetByText(AccountErrors.DuplicateName.Message);
-        Assert.Equal("alert", error.GetAttribute("role"));
-        Assert.False(saved);
-        Assert.False(closed);
+        Assert.Multiple(
+            () => Assert.Equal("alert", error.GetAttribute("role")),
+            () => Assert.False(saved),
+            () => Assert.False(closed));
     }
 
     [Fact]
-    public async Task Save_WhenAccountNameIsBlank_ShowsValidationErrorAndKeepsDialogOpen()
+    public async Task Blank_name_error_is_shown_and_dialog_stays_open()
     {
         SetupAccountServiceError(string.Empty, AccountErrors.InvalidName);
 
@@ -55,14 +69,16 @@ public sealed class AddAccountModalTests : BunitContext
         await PressSaveButton(modal);
 
         var error = modal.GetByText(AccountErrors.InvalidName.Message);
-        Assert.Equal("alert", error.GetAttribute("role"));
-        Assert.False(saved);
-        Assert.False(closed);
+        Assert.Multiple(
+            () => Assert.Equal("alert", error.GetAttribute("role")),
+            () => Assert.False(saved),
+            () => Assert.False(closed));
     }
 
     [Fact]
-    public async Task Save_WhenDuplicateNameIsCorrected_SavesAccountAndClosesDialog()
+    public async Task Account_is_saved_after_duplicate_name_is_corrected()
     {
+        // Arrange the dialog after a duplicate-name response, then correct the input.
         SetupAccountServiceError("Checking", AccountErrors.DuplicateName);
 
         SetupAccountServiceSuccess("Savings");
@@ -75,14 +91,17 @@ public sealed class AddAccountModalTests : BunitContext
         await PressSaveButton(modal);
         await GetAccountNameInput(modal, "Savings");
 
+        // Act
         await PressSaveButton(modal);
 
-        Assert.True(saved);
-        Assert.True(closed);
+        // Assert
+        Assert.Multiple(
+            () => Assert.True(saved),
+            () => Assert.True(closed));
     }
 
     [Fact]
-    public async Task Save_WhileRequestIsPending_DisablesRepeatSubmission()
+    public async Task Repeat_submission_is_disabled_while_account_save_is_pending()
     {
         // Arrange
         var completion = new TaskCompletionSource<Result>(TaskCreationOptions.RunContinuationsAsynchronously);

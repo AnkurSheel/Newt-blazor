@@ -8,6 +8,7 @@ using Moq;
 using NetWorthTracker.Business.Features.Accounts.Api;
 using NetWorthTracker.Business.Features.MonthlyBalances.Api;
 using NetWorthTracker.TestHelpers;
+using NetWorthTracker.UI.Components;
 using NetWorthTracker.UI.Feature.MonthlyBalance;
 using NetWorthTracker.UI.Tests.TestHelpers;
 
@@ -23,12 +24,13 @@ public sealed class MonthlyCheckInTests : BunitContext
         ServiceRegistry.ConfigureServices(Services);
         Services.AddSingleton(_accountService.Object);
         Services.AddSingleton(Mock.Of<IMonthlyBalanceService>());
+        ComponentFactories.AddStub<FinancialSummaryContainer>();
         SetRendererInfo(new RendererInfo("WebView", true));
         JSInterop.Mode = JSRuntimeMode.Loose;
     }
 
     [Fact]
-    public async Task InitialLoad_WhenActiveAccountsExist_DisplaysTheirNames()
+    public async Task Active_account_names_are_displayed_on_initial_load()
     {
         AccountTestHelpers.SetupActiveAccountService(
             _accountService,
@@ -43,7 +45,7 @@ public sealed class MonthlyCheckInTests : BunitContext
     }
 
     [Fact]
-    public async Task WhenBalanceExists_DisplaysFormattedBalanceAndDisablesAddTransaction()
+    public async Task Balance_is_formatted_and_add_action_disabled_when_balance_exists()
     {
         AccountTestHelpers.SetupActiveAccountService(
             _accountService,
@@ -56,15 +58,16 @@ public sealed class MonthlyCheckInTests : BunitContext
 
         await cut.WaitForAssertionAsync(() =>
         {
-            Assert.Contains(1234.5m.ToString("C2"), cut.Markup);
-            Assert.True(
-                cut.GetByRole("button", "+ Txn")
-                    .HasAttribute("disabled"));
+            Assert.Multiple(
+                () => Assert.Contains(1234.5m.ToString("C2"), cut.Markup),
+                () => Assert.True(
+                    cut.GetByRole("button", "+ Txn")
+                        .HasAttribute("disabled")));
         });
     }
 
     [Fact]
-    public async Task WhenBalanceIsMissing_DisplaysEnabledAddTransaction()
+    public async Task Add_action_opens_modal_when_balance_is_missing()
     {
         AccountTestHelpers.SetupActiveAccountService(
             _accountService,
@@ -75,17 +78,30 @@ public sealed class MonthlyCheckInTests : BunitContext
 
         IRenderedComponent<CascadingValue<DateOnly>> cut = RenderCheckIn(_selectedDate);
 
-        await cut.WaitForAssertionAsync(() =>
-        {
-            Assert.Contains("Checking", cut.Markup);
-            Assert.False(
-                cut.GetByRole("button", "+ Txn")
-                    .HasAttribute("disabled"));
-        });
+        await cut.GetByRole("button", "+ Txn").ClickAsync();
+
+        await cut.WaitForAssertionAsync(() => Assert.Contains("Save Transaction", cut.Markup));
     }
 
     [Fact]
-    public async Task WhenBalanceIsZero_DisplaysZeroAndDisablesAddTransaction()
+    public async Task Add_action_is_enabled_when_balance_is_missing()
+    {
+        AccountTestHelpers.SetupActiveAccountService(
+            _accountService,
+            new List<AccountResponseDTO>
+            {
+                AccountTestHelpers.CreateAccountResponseDto(name: "Checking")
+            });
+
+        IRenderedComponent<CascadingValue<DateOnly>> cut = RenderCheckIn(_selectedDate);
+
+        await cut.WaitForAssertionAsync(() => Assert.False(
+            cut.GetByRole("button", "+ Txn")
+                .HasAttribute("disabled")));
+    }
+
+    [Fact]
+    public async Task Zero_balance_is_displayed_and_add_action_disabled()
     {
         AccountTestHelpers.SetupActiveAccountService(
             _accountService,
@@ -98,15 +114,16 @@ public sealed class MonthlyCheckInTests : BunitContext
 
         await cut.WaitForAssertionAsync(() =>
         {
-            Assert.Contains(0m.ToString("C2"), cut.Markup);
-            Assert.True(
-                cut.GetByRole("button", "+ Txn")
-                    .HasAttribute("disabled"));
+            Assert.Multiple(
+                () => Assert.Contains(0m.ToString("C2"), cut.Markup),
+                () => Assert.True(
+                    cut.GetByRole("button", "+ Txn")
+                        .HasAttribute("disabled")));
         });
     }
 
     [Fact]
-    public async Task WhenNoActiveAccountsExist_ShowsEmptyStateAndAccountsLink()
+    public async Task Empty_state_and_accounts_link_are_shown_when_no_active_accounts_exist()
     {
         AccountTestHelpers.SetupActiveAccountService(_accountService, new List<AccountResponseDTO>());
 
@@ -114,9 +131,10 @@ public sealed class MonthlyCheckInTests : BunitContext
 
         await cut.WaitForAssertionAsync(() =>
         {
-            Assert.Contains("There are no active accounts", cut.Markup);
-            Assert.Contains("href=\"/accounts\"", cut.Markup);
-            Assert.Empty(cut.FindAll("table"));
+            Assert.Multiple(
+                () => Assert.Contains("There are no active accounts", cut.Markup),
+                () => Assert.Contains("href=\"/accounts\"", cut.Markup),
+                () => Assert.Empty(cut.FindAll("table")));
         });
     }
 

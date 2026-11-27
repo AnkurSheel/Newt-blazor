@@ -1,7 +1,8 @@
 ﻿@page "/accounts"
 @using NetWorthTracker.Business.Features.Accounts.Api
 
-<div>
+<PageHeader Title="Accounts"/>
+<div class="p-4 sm:p-8">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
         <!-- Left Group: Filter Tabs & Count Badge -->
         <div class="flex items-center gap-3 flex-wrap">
@@ -47,13 +48,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            <div class="flex items-center gap-2 min-w-0">
-                                <span
-                                    class="truncate @(item.IsClosedOn(SelectedDate) ? "line-through text-foreground-muted" : "font-medium text-foreground-secondary")"
-                                    title="@item.Name">
-                                    @item.Name
-                                </span>
-                            </div>
+                            <AccountName Account="item" SelectedDate="_currentMonth" />
                         }
                     </Template>
                 </GridColumn>
@@ -63,20 +58,7 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.Type == AccountType.ASSET)
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-financial-positive bg-financial-positive-background/60 border border-financial-positive-outline/50 rounded-full inline-block">
-                                    Asset
-                                </span>
-                            }
-                            else
-                            {
-                                <span
-                                    class="px-2.5 py-1 text-xs font-semibold text-account-liability bg-account-liability-background/60 border border-account-liability-outline/50 rounded-full inline-block">
-                                    Liability
-                                </span>
-                            }
+                            <AccountTypeBadge Type="item.Type" />
                         }
                     </Template>
                 </GridColumn>
@@ -100,14 +82,14 @@
                     <Template>
                         @{
                             var item = (AccountResponseDTO)context;
-                            if (item.OpenDate > SelectedDate)
+                            if (item.OpenDate > _currentMonth)
                             {
                                 <span
                                     class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">
                                     Not yet open
                                 </span>
                             }
-                            else if (item.IsClosedOn(SelectedDate))
+                            else if (item.IsClosedOn(_currentMonth))
                             {
                                 <span
                                     class="text-xs font-mono text-foreground-muted bg-background-page border border-outline px-2 py-1 rounded inline-block">

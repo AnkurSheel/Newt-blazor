@@ -13,8 +13,10 @@ public class AccountEntity
     {
         Name = name;
         Type = type;
-        ClosedDate = closedDate;
-        OpenDate = openDate;
+        OpenDate = new DateOnly(openDate.Year, openDate.Month, 1);
+        ClosedDate = closedDate.HasValue
+            ? new DateOnly(closedDate.Value.Year, closedDate.Value.Month, 1)
+            : null;
     }
 
     public int Id { get; private set; }

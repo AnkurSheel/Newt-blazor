@@ -9,9 +9,10 @@ public partial class AccountList
     private IReadOnlyList<AccountResponseDTO> _accounts = new List<AccountResponseDTO>();
     private string _filterStatus = "Active";
     private bool _isOpen;
+    private DateOnly _currentMonth;
 
-    [CascadingParameter]
-    public DateOnly SelectedDate { get; set; }
+    [Inject]
+    private TimeProvider Clock { get; set; } = null!;
 
     [Inject]
     private IAccountService AccountService { get; set; } = null!;
@@ -27,18 +28,20 @@ public partial class AccountList
         await LoadAccountsAsync();
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         await LoadAccountsAsync();
     }
 
     private async Task LoadAccountsAsync()
     {
+        var localNow = Clock.GetLocalNow();
+        _currentMonth = new DateOnly(localNow.Year, localNow.Month, 1);
         _accounts = _filterStatus switch
         {
-            "Active" => await AccountService.GetActiveAccountsAsync(SelectedDate),
-            "Closed" => await AccountService.GetClosedAccountsAsync(SelectedDate),
-            _ => await AccountService.GetAccountsAsync(SelectedDate)
+            "Active" => await AccountService.GetActiveAccountsAsync(_currentMonth),
+            "Closed" => await AccountService.GetClosedAccountsAsync(_currentMonth),
+            _ => await AccountService.GetAccountsAsync(_currentMonth)
         };
     }
 }
