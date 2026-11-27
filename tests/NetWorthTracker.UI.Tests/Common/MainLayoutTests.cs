@@ -43,43 +43,49 @@ public sealed class MainLayoutTests : BunitContext
     }
 
     [Fact]
-    public void AccountScreen_DoesNotShowMonthControlsOrFinancialSummary()
+    public void Account_screen_hides_month_controls_and_financial_summary()
     {
         var layout = Render<MainLayout>(parameters => parameters.Add(component => component.Body, Screen<AccountList>()));
 
-        Assert.Empty(layout.FindAll("button[aria-label='Previous month']"));
-        Assert.DoesNotContain("Financial summary", layout.Markup);
+        Assert.Multiple(
+            () => Assert.Empty(layout.FindAll("button[aria-label='Previous month']")),
+            () => Assert.DoesNotContain("Financial summary", layout.Markup));
     }
 
     [Fact]
-    public void DashboardScreen_ShowsMonthControlsAndFinancialSummary()
+    public void Dashboard_shows_month_controls_and_financial_summary()
     {
         var layout = Render<MainLayout>(parameters => parameters.Add(component => component.Body, Screen<Dashboard>()));
 
-        Assert.NotEmpty(layout.FindAll("button[aria-label='Previous month']"));
-        Assert.Contains("Financial summary", layout.Markup);
+        Assert.Multiple(
+            () => Assert.NotEmpty(layout.FindAll("button[aria-label='Previous month']")),
+            () => Assert.Contains("Financial summary", layout.Markup));
     }
 
     [Fact]
-    public void MonthlyCheckInScreen_ShowsMonthControlsAndFinancialSummary()
+    public void Monthly_check_in_shows_month_controls_and_financial_summary()
     {
         var layout = Render<MainLayout>(parameters => parameters.Add(component => component.Body, Screen<MonthlyCheckIn>()));
 
-        Assert.NotEmpty(layout.FindAll("button[aria-label='Previous month']"));
-        Assert.Contains("Financial summary", layout.Markup);
+        Assert.Multiple(
+            () => Assert.NotEmpty(layout.FindAll("button[aria-label='Previous month']")),
+            () => Assert.Contains("Financial summary", layout.Markup));
     }
 
     [Fact]
-    public async Task SelectedMonth_PersistsWhenLeavingAndReturningToMonthlyCheckIn()
+    public async Task Selected_month_is_preserved_when_returning_to_monthly_check_in()
     {
+        // Arrange a selected month and navigate away from the check-in screen.
         _accounts.Setup(service => service.GetActiveAccountsAsync(new DateOnly(2026, 7, 1)))
             .ReturnsAsync([AccountTestHelpers.CreateAccountResponseDto(name: "July account")]);
         var layout = Render<MainLayout>(parameters => parameters.Add(component => component.Body, Screen<MonthlyCheckIn>()));
         await layout.GetByRole("button", "Next month").ClickAsync();
         layout.Render(parameters => parameters.Add(component => component.Body, Screen<AccountList>()));
 
+        // Act
         layout.Render(parameters => parameters.Add(component => component.Body, Screen<MonthlyCheckIn>()));
 
+        // Assert
         await layout.WaitForAssertionAsync(() => Assert.Contains("July account", layout.Markup));
     }
 

@@ -40,7 +40,7 @@ public sealed class SelectedMonthTests : BunitContext
     }
 
     [Fact]
-    public async Task NextMonth_UpdatesFinancialSummaryOnMonthlyCheckIn()
+    public async Task Monthly_check_in_summary_updates_when_next_month_is_selected()
     {
         RenderFragment page = builder =>
         {

@@ -8,7 +8,7 @@ namespace NetWorthTracker.UI.Tests.Feature.Account;
 public sealed class AccountNameTests : BunitContext
 {
     [Fact]
-    public void AccountNameDisplaysNameAndTitle()
+    public void Account_name_is_visible_and_available_in_tooltip()
     {
         var account = AccountTestHelpers.CreateAccountResponseDto(
             name: "Everyday account",

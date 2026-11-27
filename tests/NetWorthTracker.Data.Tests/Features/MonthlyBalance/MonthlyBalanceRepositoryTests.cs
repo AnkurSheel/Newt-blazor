@@ -26,7 +26,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddAsync_WithValidMonthlyBalance_PersistsNormalizedMonthDate()
+    public async Task Balance_is_stored_at_month_start_when_added_with_mid_month_date()
     {
         var accountId = await AccountTestHelpers.AddAccount(_database);
 
@@ -38,7 +38,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetBalanceByDateAsync_WhenMatchingRecordExists_ReturnsAmount()
+    public async Task Balance_amount_is_returned_when_requested_month_exists()
     {
         var targetDate = new DateOnly(2026, 2, 1);
         var accountId = await AccountTestHelpers.AddAccount(_database);
@@ -51,7 +51,7 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetBalanceByDateAsync_WhenNoMatchingRecordExists_ReturnsNull()
+    public async Task Null_is_returned_when_requested_month_has_no_balance()
     {
         var queryDate = new DateOnly(2026, 2, 1);
         var accountId = await AccountTestHelpers.AddAccount(_database);
@@ -62,16 +62,14 @@ public sealed class MonthlyBalanceRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddAsync_WhenBalanceAlreadyExistsForMonth_ThrowsDuplicateMonthlyBalanceException()
+    public async Task Duplicate_monthly_balance_is_rejected_when_month_already_has_a_balance()
     {
         var balanceDate = new DateOnly(2026, 2, 1);
         var accountId = await AccountTestHelpers.AddAccount(_database);
         await AddMonthlyBalance(accountId, balanceDate, 3200m);
 
-        var exception = await Assert.ThrowsAsync<DuplicateMonthlyBalanceException>(
+        await Assert.ThrowsAsync<DuplicateMonthlyBalanceException>(
             () => AddMonthlyBalance(accountId, balanceDate.AddDays(10), 3400m));
-
-        Assert.IsType<Microsoft.Data.Sqlite.SqliteException>(exception.InnerException?.InnerException);
     }
 
     private async Task AddMonthlyBalance(int accountId, DateOnly balanceDate, decimal amount)

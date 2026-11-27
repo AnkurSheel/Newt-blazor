@@ -19,7 +19,7 @@ public sealed class MonthlyBalanceServiceTests
     }
 
     [Fact]
-    public async Task AddMonthlyBalanceAsync_WithActiveAccountAndNoExistingBalance_AddsAtMonthStart()
+    public async Task New_balance_is_saved_at_month_start_for_active_account_without_existing_balance()
     {
         var accountId = 12;
         var balanceDate = new DateOnly(2026, 6, 15);
@@ -31,17 +31,18 @@ public sealed class MonthlyBalanceServiceTests
         var result = await _monthlyBalanceService.AddMonthlyBalanceAsync(
             new MonthlyBalanceCreateDTO(accountId, balanceDate, amount));
 
-        Assert.True(result.IsSuccess);
-        _repository.Verify(
-            repository => repository.AddAsync(It.Is<MonthlyBalanceCreateDTO>(
-                balance => balance.AccountId == accountId
-                           && balance.BalanceDate == monthStart
-                           && balance.Amount == amount)),
-            Times.Once);
+        Assert.Multiple(
+            () => Assert.True(result.IsSuccess),
+            () => _repository.Verify(
+                repository => repository.AddAsync(It.Is<MonthlyBalanceCreateDTO>(
+                    balance => balance.AccountId == accountId
+                               && balance.BalanceDate == monthStart
+                               && balance.Amount == amount)),
+                Times.Once));
     }
 
     [Fact]
-    public async Task AddMonthlyBalanceAsync_WhenAccountIsNotActive_ReturnsEligibilityFailureWithoutPersisting()
+    public async Task Balance_is_rejected_without_saving_when_account_is_not_active()
     {
         var accountId = 12;
         var monthStart = new DateOnly(2026, 6, 1);
@@ -50,12 +51,16 @@ public sealed class MonthlyBalanceServiceTests
         var result = await _monthlyBalanceService.AddMonthlyBalanceAsync(
             new MonthlyBalanceCreateDTO(accountId, new DateOnly(2026, 6, 15), 1250m));
 
-        Assert.Equal(MonthlyBalanceErrors.AccountNotEligible, result.Error);
-        _repository.Verify(repository => repository.AddAsync(It.IsAny<MonthlyBalanceCreateDTO>()), Times.Never);
+        Assert.Multiple(
+            () => Assert.Equal(MonthlyBalanceErrors.AccountNotEligible.Code, result.Error.Code),
+            () => Assert.Equal(MonthlyBalanceErrors.AccountNotEligible.Message, result.Error.Message),
+            () => _repository.Verify(
+                repository => repository.AddAsync(It.IsAny<MonthlyBalanceCreateDTO>()),
+                Times.Never));
     }
 
     [Fact]
-    public async Task AddMonthlyBalanceAsync_WhenBalanceAlreadyExists_ReturnsDuplicateFailureWithoutPersisting()
+    public async Task Duplicate_failure_is_returned_without_saving_when_balance_already_exists()
     {
         var accountId = 12;
         var monthStart = new DateOnly(2026, 6, 1);
@@ -65,12 +70,16 @@ public sealed class MonthlyBalanceServiceTests
         var result = await _monthlyBalanceService.AddMonthlyBalanceAsync(
             new MonthlyBalanceCreateDTO(accountId, new DateOnly(2026, 6, 15), 1250m));
 
-        Assert.Equal(MonthlyBalanceErrors.DuplicateBalance, result.Error);
-        _repository.Verify(repository => repository.AddAsync(It.IsAny<MonthlyBalanceCreateDTO>()), Times.Never);
+        Assert.Multiple(
+            () => Assert.Equal(MonthlyBalanceErrors.DuplicateBalance.Code, result.Error.Code),
+            () => Assert.Equal(MonthlyBalanceErrors.DuplicateBalance.Message, result.Error.Message),
+            () => _repository.Verify(
+                repository => repository.AddAsync(It.IsAny<MonthlyBalanceCreateDTO>()),
+                Times.Never));
     }
 
     [Fact]
-    public async Task AddMonthlyBalanceAsync_WhenConcurrentInsertViolatesUniqueIndex_ReturnsDuplicateFailure()
+    public async Task Duplicate_failure_is_returned_when_duplicate_occurs_during_balance_save()
     {
         var accountId = 12;
         var monthStart = new DateOnly(2026, 6, 1);
@@ -82,7 +91,9 @@ public sealed class MonthlyBalanceServiceTests
         var result = await _monthlyBalanceService.AddMonthlyBalanceAsync(
             new MonthlyBalanceCreateDTO(accountId, monthStart, 1250m));
 
-        Assert.Equal(MonthlyBalanceErrors.DuplicateBalance, result.Error);
+        Assert.Multiple(
+            () => Assert.Equal(MonthlyBalanceErrors.DuplicateBalance.Code, result.Error.Code),
+            () => Assert.Equal(MonthlyBalanceErrors.DuplicateBalance.Message, result.Error.Message));
     }
 
     private void SetupAccountActive(int accountId, DateOnly selectedDate, bool isActive)

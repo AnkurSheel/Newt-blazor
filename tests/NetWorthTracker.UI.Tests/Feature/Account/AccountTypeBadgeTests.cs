@@ -10,7 +10,7 @@ public sealed class AccountTypeBadgeTests : BunitContext
     [Theory]
     [InlineData(AccountType.ASSET, "Asset")]
     [InlineData(AccountType.LIABILITY, "Liability")]
-    public void Render_DisplaysTheLabelForProvidedAccountType(AccountType type, string label)
+    public void Account_type_badge_shows_readable_label_for_each_account_type(AccountType type, string label)
     {
         var component = Render<AccountTypeBadge>(parameters => parameters.Add(x => x.Type, type));
 

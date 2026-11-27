@@ -27,7 +27,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummaryAsync_WhenNoBalancesForDate_ReturnsDefaultSummary()
+    public async Task Zero_summary_is_returned_when_no_balances_exist_for_selected_date()
     {
         var queryDate = new DateOnly(2026, 5, 1);
 
@@ -41,7 +41,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummaryAsync_AggregatesAssetsAndLiabilitiesSeparately()
+    public async Task Assets_and_liabilities_are_summed_separately()
     {
         var queryDate = new DateOnly(2026, 4, 1);
 
@@ -72,7 +72,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummaryAsync_WhenAccountOpenedAfterSelectedDate_ExcludesFromSummary()
+    public async Task Accounts_opened_after_selected_date_are_excluded_from_summary()
     {
         var queryDate = new DateOnly(2026, 3, 1);
 
@@ -96,7 +96,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummaryAsync_WhenAccountClosedOnOrBeforeSelectedDate_ExcludesFromSummary()
+    public async Task Accounts_closed_on_or_before_selected_date_are_excluded_from_summary()
     {
         var queryDate = new DateOnly(2026, 3, 1);
 
@@ -121,7 +121,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummariesAsync_FiltersUpToSelectedDateAndOrdersByMonthAscending()
+    public async Task Monthly_summaries_include_only_months_through_cutoff_in_ascending_order()
     {
         var cutoffDate = new DateOnly(2025, 3, 1);
 
@@ -149,8 +149,8 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
         IReadOnlyList<MonthlySummaryDTO> result =
             await _financialSummaryRepository.GetMonthlySummariesAsync(cutoffDate);
 
-        Assert.Equal(3, result.Count);
         Assert.Multiple(
+            () => Assert.Equal(3, result.Count),
             () => Assert.Equal(new DateOnly(2025, 1, 1), result[0].SelectedDate),
             () => Assert.Equal(10000m, result[0].TotalAssets),
             () => Assert.Equal(2000m, result[0].TotalLiabilities),
@@ -163,7 +163,7 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetYearlySummariesAsync_ReturnsLatestMonthSummaryForEachYearUpToSelectedDate()
+    public async Task Yearly_summaries_use_latest_month_through_cutoff_for_each_year()
     {
         var cutoffDate = new DateOnly(2026, 6, 1);
 
@@ -206,8 +206,8 @@ public sealed class FinancialSummaryRepositoryTests : IAsyncLifetime
 
         IReadOnlyList<MonthlySummaryDTO> result = await _financialSummaryRepository.GetYearlySummariesAsync(cutoffDate);
 
-        Assert.Equal(3, result.Count);
         Assert.Multiple(
+            () => Assert.Equal(3, result.Count),
             () => Assert.Equal(new DateOnly(2024, 12, 1), result[0].SelectedDate),
             () => Assert.Equal(2000m, result[0].TotalAssets),
             () => Assert.Equal(400m, result[0].TotalLiabilities),

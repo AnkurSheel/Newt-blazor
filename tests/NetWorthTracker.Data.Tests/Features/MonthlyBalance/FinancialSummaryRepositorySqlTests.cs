@@ -27,7 +27,7 @@ public sealed class FinancialSummaryRepositorySqlTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetMonthlySummariesQuery_GeneratesExpectedSql()
+    public async Task Monthly_summaries_query_generates_expected_sql()
     {
         await _repository.GetMonthlySummariesAsync(new DateOnly(2026, 3, 1));
 
@@ -35,7 +35,7 @@ public sealed class FinancialSummaryRepositorySqlTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetYearlySummariesQuery_GeneratesExpectedSql()
+    public async Task Yearly_summaries_query_generates_expected_sql()
     {
         await _repository.GetYearlySummariesAsync(new DateOnly(2026, 6, 1));
 

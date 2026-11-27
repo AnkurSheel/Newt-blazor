@@ -30,7 +30,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Database_WhenAccountDateIsNotFirstOfMonth_RejectsAccount()
+    public async Task Database_rejects_account_date_that_is_not_first_of_month()
     {
         await using var context = await _database.CreateDbContextAsync();
 
@@ -39,7 +39,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddAsync_WhenOpeningAndClosingAreInSameMonth_RejectsAccount()
+    public async Task Account_is_rejected_when_opening_and_closing_dates_share_month()
     {
         var account = AccountTestHelpers.GetAccountCreateDto(
             openDate: new DateOnly(2026, 6, 5), closedDate: new DateOnly(2026, 6, 25));
@@ -48,7 +48,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddAsync_WithMidMonthDates_PersistsFirstOfEachMonth()
+    public async Task Mid_month_opening_and_closing_dates_are_normalized_to_month_start()
     {
         var account = AccountTestHelpers.GetAccountCreateDto(
             openDate: new DateOnly(2025, 1, 15), closedDate: new DateOnly(2026, 6, 27));
@@ -62,7 +62,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenNoAccountsExist_ReturnsEmptyList()
+    public async Task Account_list_is_empty_when_no_accounts_exist()
     {
         IReadOnlyList<AccountResponseDTO> result = await _repository.GetAllAsync(queryDate);
 
@@ -70,7 +70,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenAccountsExistWithoutBalances_ReturnsAccountsWithNullBalance()
+    public async Task Account_balances_are_null_when_no_balances_exist()
     {
         await AccountTestHelpers.AddAccount(_database);
 
@@ -81,7 +81,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenBalanceExistsOnSelectedDate_PopulatesBalanceOnDate()
+    public async Task Balance_is_populated_when_it_exists_on_selected_date()
     {
         var accountId = await AccountTestHelpers.AddAccount(_database);
 
@@ -98,7 +98,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenBalanceExistsForDifferentDate_ReturnsNullBalanceOnDate()
+    public async Task Balance_is_null_when_only_another_date_has_a_balance()
     {
         var queryDate = new DateOnly(2026, 1, 1);
 
@@ -115,7 +115,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_MapsAllAccountPropertiesCorrectly()
+    public async Task Account_details_are_returned_for_selected_date()
     {
         var openDate = new DateOnly(2024, 6, 1);
         var closedDate = new DateOnly(2026, 12, 1);
@@ -141,7 +141,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetByIdAsync_WhenAccountExists_ReturnsRequestedAccount()
+    public async Task Requested_account_is_returned_with_its_details_and_balance()
     {
         var requestedAccountId = await AccountTestHelpers.AddAccount(
             _database,
@@ -168,7 +168,7 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetByIdAsync_WhenAccountDoesNotExist_ReturnsNull()
+    public async Task No_account_is_returned_when_requested_account_does_not_exist()
     {
         AccountResponseDTO? result = await _repository.GetByIdAsync(42, queryDate);
 
@@ -180,7 +180,10 @@ public sealed class AccountRepositoryTests : IAsyncLifetime
     [InlineData("Checking", "CHECKING")]
     [InlineData("Checking", "cHeCkInG")]
     [InlineData("Épargne", "éPARGNE")]
-    public async Task AddAsync_WhenNameMatchesIgnoringCase_RejectsDuplicate(string existingName, string duplicateName)
+    public async Task Account_names_are_duplicates_when_they_differ_only_by_case(
+        string existingName,
+        string duplicateName
+    )
     {
         var openDate = new DateOnly(2025, 1, 1);
         await _repository.AddAsync(AccountTestHelpers.GetAccountCreateDto(existingName, openDate: openDate));

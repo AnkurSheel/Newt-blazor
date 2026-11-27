@@ -27,7 +27,7 @@ public sealed class AddMonthlyBalanceModalTests : BunitContext
     }
 
     [Fact]
-    public async Task Save_WhenAccountIsNotEligible_ShowsErrorAndKeepsModalOpen()
+    public async Task Eligibility_error_is_shown_and_modal_stays_open_when_account_is_not_eligible()
     {
         SetupMonthlyBalanceServiceError(MonthlyBalanceErrors.AccountNotEligible);
 
@@ -48,7 +48,7 @@ public sealed class AddMonthlyBalanceModalTests : BunitContext
     }
 
     [Fact]
-    public async Task Save_WhenSuccessful_InvokesSavedCallbackAndClosesModal()
+    public async Task Successful_save_invokes_callback_and_closes_modal()
     {
         SetupMonthlyBalanceServiceSuccess();
 
@@ -66,20 +66,24 @@ public sealed class AddMonthlyBalanceModalTests : BunitContext
     }
 
     [Fact]
-    public async Task ChangeMonth_AfterEligibilityFailure_ClearsError()
+    public async Task Eligibility_error_is_cleared_when_month_changes()
     {
+        // Arrange the modal with an eligibility error.
         SetupMonthlyBalanceServiceError(MonthlyBalanceErrors.AccountNotEligible);
         IRenderedComponent<AddMonthlyBalanceModal> modal = RenderModal();
         await PressSaveButton(modal);
 
+        // Act
         await ChangeMonth(modal, new DateOnly(2000, 1, 1));
 
+        // Assert
         Assert.Empty(modal.FindAll("[role='alert']"));
     }
 
     [Fact]
-    public async Task Save_WhenMonthIsCorrectedAfterEligibilityFailure_SavesAndClosesModal()
+    public async Task Balance_is_saved_after_correcting_month_following_eligibility_failure()
     {
+        // Arrange the modal after an eligibility failure, then correct the month.
         _monthlyBalanceService
             .SetupSequence(service => service.AddMonthlyBalanceAsync(It.IsAny<MonthlyBalanceCreateDTO>()))
             .ReturnsAsync(Result.Failure(MonthlyBalanceErrors.AccountNotEligible))
@@ -94,15 +98,17 @@ public sealed class AddMonthlyBalanceModalTests : BunitContext
         await PressSaveButton(modal);
         await ChangeMonth(modal, new DateOnly(2000, 1, 1));
 
+        // Act
         await PressSaveButton(modal);
 
+        // Assert
         Assert.Multiple(
             () => Assert.True(saved),
             () => Assert.Equal(new[] { false }, visibilityChanges));
     }
 
     [Fact]
-    public async Task Save_WhileRequestIsPending_DisablesRepeatSubmission()
+    public async Task Repeat_submission_is_disabled_while_balance_save_is_pending()
     {
         var completion = new TaskCompletionSource<Result>(TaskCreationOptions.RunContinuationsAsynchronously);
         _monthlyBalanceService.Setup(service => service.AddMonthlyBalanceAsync(It.IsAny<MonthlyBalanceCreateDTO>()))

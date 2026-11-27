@@ -18,7 +18,7 @@ public sealed class FinancialSummaryServiceTests
     }
 
     [Fact]
-    public async Task GetMonthlyNetworthChangeAsync_WithCurrentAndPreviousSummaries_ReturnsExistingChangeValues()
+    public async Task Monthly_changes_are_calculated_from_current_and_previous_summaries()
     {
         var selectedDate = new DateOnly(2026, 4, 1);
         var previousDate = selectedDate.AddMonths(-1);
@@ -40,7 +40,7 @@ public sealed class FinancialSummaryServiceTests
     }
 
     [Fact]
-    public async Task GetMonthlyTrendsAsync_WhenPreviousNetWorthIsZero_ReturnsZeroChanges()
+    public async Task Changes_are_zero_when_previous_net_worth_is_zero()
     {
         var previousDate = new DateOnly(2026, 2, 1);
         var selectedDate = new DateOnly(2026, 3, 1);
@@ -52,14 +52,14 @@ public sealed class FinancialSummaryServiceTests
             ]);
         IReadOnlyList<TrendDTO> result = await _financialSummaryService.GetMonthlyTrendsAsync(selectedDate);
 
-        Assert.Equal(2, result.Count);
         Assert.Multiple(
+            () => Assert.Equal(2, result.Count),
             () => Assert.Equal(0m, result[1].AbsoluteNetWorthChange),
             () => Assert.Equal(0f, result[1].NetWorthPercentChange));
     }
 
     [Fact]
-    public async Task GetYearlyTrendsAsync_WithSummaries_ReturnsOrderedNetWorthChanges()
+    public async Task Yearly_net_worth_changes_are_returned_in_order()
     {
         var firstDate = new DateOnly(2024, 12, 1);
         var secondDate = new DateOnly(2025, 12, 1);
@@ -74,8 +74,8 @@ public sealed class FinancialSummaryServiceTests
 
         IReadOnlyList<TrendDTO> result = await _financialSummaryService.GetYearlyTrendsAsync(selectedDate);
 
-        Assert.Equal(3, result.Count);
         Assert.Multiple(
+            () => Assert.Equal(3, result.Count),
             () => Assert.Equal(firstDate, result[0].SelectedDate),
             () => Assert.Equal(100m, result[0].CumulativeNetWorth),
             () => Assert.Equal(0m, result[0].AbsoluteNetWorthChange),
@@ -91,7 +91,7 @@ public sealed class FinancialSummaryServiceTests
     }
 
     [Fact]
-    public async Task GetMonthlyTrendsAsync_WhenNoSummaries_ReturnsEmptyList()
+    public async Task Monthly_trends_are_empty_when_no_summaries_exist()
     {
         var selectedDate = new DateOnly(2026, 6, 1);
         _financialSummaryRepository.Setup(value => value.GetMonthlySummariesAsync(selectedDate))
@@ -103,7 +103,7 @@ public sealed class FinancialSummaryServiceTests
     }
 
     [Fact]
-    public async Task GetYearlyTrendsAsync_WhenNoSummaries_ReturnsEmptyList()
+    public async Task Yearly_trends_are_empty_when_no_summaries_exist()
     {
         var selectedDate = new DateOnly(2026, 6, 1);
         _financialSummaryRepository.Setup(value => value.GetYearlySummariesAsync(selectedDate))
