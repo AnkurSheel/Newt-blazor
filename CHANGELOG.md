@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0.0] - 2026-11-28
+
 ### Changed
 
 - The Accounts page now shows account status for the current month and no longer displays the dashboard's month selector or summary cards.
